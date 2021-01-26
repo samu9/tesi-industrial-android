@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- The recommended margin for the top, left, and right edges of a card. -->
+    <dimen name="glass_card_margin">40dp</dimen>
+
+    <!-- The recommended margin between the bottom of the card and the footer. -->
+    <dimen name="glass_card_footer_margin">50dp</dimen>
+
+    <!-- The recommended margin for the left column of the two-column card. -->
+    <dimen name="glass_card_two_column_margin">30dp</dimen>
+
+</resources>
