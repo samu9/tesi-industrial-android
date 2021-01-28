@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <FrameLayout
+
+    <androidx.viewpager.widget.ViewPager
         android:id="@+id/body_layout"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -18,7 +19,7 @@
 
         <!-- Put your widgets inside this FrameLayout. -->
 
-    </FrameLayout>
+    </androidx.viewpager.widget.ViewPager>
 
     <!-- The footer view will grow to fit as much content as possible while the
            timestamp view keeps its width. If the footer text is too long, it

@@ -3,13 +3,20 @@ package com.example.industrial;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.industrial.adapters.MachineDataAdapter;
 import com.example.industrial.models.Area;
+import com.example.industrial.models.MachineData;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -26,6 +33,10 @@ public class MachineFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String machineName;
     private int machineId;
+    ArrayList<MachineData> machineData;
+
+    RecyclerView dataList;
+    MachineDataAdapter adapter;
 
     DataService service = new DataService(getContext());
 
@@ -59,6 +70,8 @@ public class MachineFragment extends Fragment {
             machineName = getArguments().getString(MACHINE_NAME);
             machineId = getArguments().getInt(MACHINE_ID);
         }
+
+        machineData = new ArrayList<>();
     }
 
     @Override
@@ -66,13 +79,19 @@ public class MachineFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_machine, container, false);
+
         TextView nameView = v.findViewById(R.id.machine_name);
         TextView idView = v.findViewById(R.id.machine_id);
+        dataList = v.findViewById(R.id.machine_data_list);
 
         nameView.setText(machineName);
         idView.setText(Integer.toString(machineId));
 
-        service.getArea(1, new DataService.VolleyResponseListener() {
+        adapter = new MachineDataAdapter(machineData);
+        dataList.setLayoutManager(new LinearLayoutManager(v.getContext()));
+        dataList.setAdapter(adapter);
+
+        service.getMachineData(machineId, new DataService.VolleyResponseListener() {
             @Override
             public void onError(String message) {
 
@@ -80,8 +99,11 @@ public class MachineFragment extends Fragment {
 
             @Override
             public void onResponse(Object response) {
-                Area area = (Area) response;
-                System.out.println("Area " + area.getName() + " from Fragment");
+
+                machineData.addAll((ArrayList<MachineData>) response);
+
+                adapter.notifyDataSetChanged();
+//                System.out.println("from fragment " + machineData.size() + " " + machineData.get(0).getValues()[0]);
             }
         });
 

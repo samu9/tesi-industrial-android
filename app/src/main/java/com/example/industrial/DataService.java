@@ -9,6 +9,7 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.industrial.models.Area;
 import com.example.industrial.models.Machine;
+import com.example.industrial.models.MachineData;
 import com.example.industrial.models.Sector;
 
 import org.json.JSONArray;
@@ -84,9 +85,9 @@ public class DataService {
         VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
-    public void getMachines(int sector_id, VolleyResponseListener responseListener){
+    public void getSectorMachines(int sector_id, VolleyResponseListener responseListener){
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET,
-                BASE_URL + "/sector/" + Integer.toString(sector_id) + "/machines",
+                BASE_URL + "/sector/" + sector_id + "/machines",
                 null,
                 new Response.Listener<JSONArray>(){
                     @Override
@@ -116,6 +117,44 @@ public class DataService {
 
                     }
                 });
+
+        VolleySingleton.getInstance(context).addToRequestQueue(jsonArrayRequest);
+    }
+
+    public void getMachineData(int machine_id, VolleyResponseListener responseListener){
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET,
+                BASE_URL + "/machine/" + machine_id + "/data", null,
+                response -> {
+                    List<MachineData> data = new ArrayList<>();
+                    for(int i = 0; i < response.length(); i++){
+                        try {
+                            JSONObject object = response.getJSONObject(i);
+
+                            JSONArray objectValues = object.getJSONArray("values");
+                            int[] values = new int[objectValues.length()];
+                            for (int j = 0; j < objectValues.length(); j++){
+                                values[j] = (int)objectValues.get(j);
+                            }
+
+                            data.add(new MachineData(object.getInt("machine_id"), values,
+                            object.getString("timestamp")));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                    int[] temp = new int[3];
+                    temp[0] = 0;
+                    temp[1] = 0;
+                    temp[2] = 0;
+//                    data.add(new MachineData(0, temp, ""));
+                    responseListener.onResponse(data);
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                responseListener.onError(error.getMessage());
+            }
+        });
 
         VolleySingleton.getInstance(context).addToRequestQueue(jsonArrayRequest);
     }
