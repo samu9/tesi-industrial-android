@@ -27,7 +27,9 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 }
-
+repositories {
+    maven { url 'https://jitpack.io' }
+}
 dependencies {
 
     implementation 'androidx.appcompat:appcompat:1.2.0'
@@ -44,4 +46,6 @@ dependencies {
 
     // Java language implementation
     implementation "androidx.fragment:fragment:$fragment_version"
+
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 }

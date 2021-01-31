@@ -86,7 +86,7 @@ public class MainActivity extends FragmentActivity {
                 Machine m = machines.get(2);
 
                 for(int i = 0; i < machines.size(); i++){
-                    fragments.add(MachineFragment.newInstance(machines.get(i).getName(), machines.get(i).getId()));
+                    fragments.add(MachineFragment.newInstance(machines.get(i).getName(), machines.get(i).getId(), machines.get(i).getStatus()));
                 }
                 screenSlidePagerAdapter.notifyDataSetChanged();
 

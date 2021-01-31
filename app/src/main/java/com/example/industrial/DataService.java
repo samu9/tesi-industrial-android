@@ -20,7 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DataService {
-    private static String BASE_URL = "http://192.168.1.151:5000";
+//    private static String BASE_URL = "http://192.168.1.151:5000";
+    private static String BASE_URL = "http://192.168.1.7:5000";
     private Context context;
 
     public interface VolleyResponseListener {
@@ -99,7 +100,8 @@ public class DataService {
                             try {
                                 JSONObject machineObject = response.getJSONObject(i);
 
-                                Machine machine = new Machine(machineObject.getString("name"), machineObject.getInt("id"), 1);
+                                Machine machine = new Machine(machineObject.getString("name"),
+                                        machineObject.getInt("id"), 1, machineObject.getString("status"));
                                 machines.add(machine);
                             } catch (JSONException e) {
                                 e.printStackTrace();
