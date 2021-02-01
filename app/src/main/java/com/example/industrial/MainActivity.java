@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends FragmentActivity {
-    private static final int area_id = 1;
-    private static final int sector_id = 1;
+    private static int area_id;
+    private static int sector_id;
 
     private ArrayList<Machine> machines = new ArrayList<>();
     private List<MachineFragment> fragments = new ArrayList<>();
@@ -47,7 +47,7 @@ public class MainActivity extends FragmentActivity {
 
         timestamp.setText("timestamp");
 
-        service.getArea(area_id, new DataService.VolleyResponseListener() {
+        service.getCurrentPosition(new DataService.VolleyResponseListener() {
             @Override
             public void onError(String message) {
 
@@ -55,10 +55,11 @@ public class MainActivity extends FragmentActivity {
 
             @Override
             public void onResponse(Object response) {
-                Area area = (Area)response;
-                footerTexts[0] = area.getName();
+                DataService.Position position = (DataService.Position) response;
+                area_id = position.area_id;
+                sector_id = position.sector_id;
 
-                service.getSector(sector_id, new DataService.VolleyResponseListener() {
+                service.getArea(area_id, new DataService.VolleyResponseListener() {
                     @Override
                     public void onError(String message) {
 
@@ -66,33 +67,46 @@ public class MainActivity extends FragmentActivity {
 
                     @Override
                     public void onResponse(Object response) {
-                        Sector sector = (Sector) response;
-                        footerTexts[1] = sector.getName();
-                        footer.setText("Area: " + footerTexts[0]+ " - Settore: " + footerTexts[1]);
+                        Area area = (Area)response;
+                        footerTexts[0] = area.getName();
+
+                        service.getSector(sector_id, new DataService.VolleyResponseListener() {
+                            @Override
+                            public void onError(String message) {
+
+                            }
+
+                            @Override
+                            public void onResponse(Object response) {
+                                Sector sector = (Sector) response;
+                                footerTexts[1] = sector.getName();
+                                footer.setText("Area: " + footerTexts[0]+ " - Settore: " + footerTexts[1]);
+                            }
+                        });
+                    }
+                });
+
+                service.getSectorMachines(sector_id, new DataService.VolleyResponseListener() {
+                    @Override
+                    public void onError(String message) {
+
+                    }
+
+                    @Override
+                    public void onResponse(Object response) {
+                        machines = (ArrayList<Machine>) response;
+
+                        for(int i = 0; i < machines.size(); i++){
+                            fragments.add(MachineFragment.newInstance(machines.get(i).getName(), machines.get(i).getId(), machines.get(i).getStatus()));
+                        }
+                        screenSlidePagerAdapter.notifyDataSetChanged();
+
+//                getSupportFragmentManager().beginTransaction().replace(R.id.body_layout, fragments.get(0)).commit();
                     }
                 });
             }
         });
 
-        service.getSectorMachines(sector_id, new DataService.VolleyResponseListener() {
-            @Override
-            public void onError(String message) {
-
-            }
-
-            @Override
-            public void onResponse(Object response) {
-                machines = (ArrayList<Machine>) response;
-                Machine m = machines.get(2);
-
-                for(int i = 0; i < machines.size(); i++){
-                    fragments.add(MachineFragment.newInstance(machines.get(i).getName(), machines.get(i).getId(), machines.get(i).getStatus()));
-                }
-                screenSlidePagerAdapter.notifyDataSetChanged();
-
-//                getSupportFragmentManager().beginTransaction().replace(R.id.body_layout, fragments.get(0)).commit();
-            }
-        });
 
     }
 

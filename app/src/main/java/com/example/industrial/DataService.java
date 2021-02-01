@@ -20,8 +20,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DataService {
-//    private static String BASE_URL = "http://192.168.1.151:5000";
-    private static String BASE_URL = "http://192.168.1.7:5000";
+
+    public interface Control{
+        String START = "START";
+        String STOP = "STOP";
+        String HALT = "HALT";
+        String PAUSE = "PAUSE";
+
+    }
+
+    public class Position{
+        int area_id;
+        int sector_id;
+
+        public Position(int area_id, int sector_id) {
+            this.area_id = area_id;
+            this.sector_id = sector_id;
+        }
+    }
+    private static String BASE_URL = "http://192.168.1.151:5000";
+//    private static String BASE_URL = "http://192.168.1.7:5000";
     private Context context;
 
     public interface VolleyResponseListener {
@@ -32,6 +50,27 @@ public class DataService {
 
     public DataService(Context context) {
         this.context = context;
+    }
+
+    public void getCurrentPosition(VolleyResponseListener responseListener){
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET,
+                BASE_URL + "/position", null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            responseListener.onResponse(new Position(response.getInt("area_id"), response.getInt("sector_id")));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+        VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
     public void getArea(int area_id, VolleyResponseListener responseListener){
@@ -159,5 +198,21 @@ public class DataService {
         });
 
         VolleySingleton.getInstance(context).addToRequestQueue(jsonArrayRequest);
+    }
+
+    public void controlMachine(int machine_id, String control, VolleyResponseListener responseListener){
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
+                BASE_URL + "/machine/" + machine_id + "/" + control, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
     }
 }

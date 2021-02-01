@@ -16,6 +16,9 @@ import com.example.industrial.adapters.MachineDataAdapter;
 import com.example.industrial.models.Area;
 import com.example.industrial.models.MachineData;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -45,6 +48,7 @@ public class MachineFragment extends Fragment {
 
     RecyclerView dataList;
     MachineDataAdapter adapter;
+    TextView statusView, idView, nameView;
 
     LineChart chart;
 
@@ -92,9 +96,9 @@ public class MachineFragment extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_machine, container, false);
 
-        TextView nameView = v.findViewById(R.id.machine_name);
-        TextView idView = v.findViewById(R.id.machine_id);
-        TextView statusView = v.findViewById(R.id.machine_status);
+        nameView = v.findViewById(R.id.machine_name);
+        idView = v.findViewById(R.id.machine_id);
+        statusView = v.findViewById(R.id.machine_status);
         dataList = v.findViewById(R.id.machine_data_list);
 
         chart = v.findViewById(R.id.machine_chart);
@@ -104,6 +108,17 @@ public class MachineFragment extends Fragment {
         chart.setDrawMarkers(false);
         chart.setGridBackgroundColor(Color.BLACK);
         chart.setBorderColor(Color.BLACK);
+        XAxis xAxis = chart.getXAxis();
+        YAxis axisRight = chart.getAxisRight();
+        YAxis axisLeft = chart.getAxisLeft();
+        xAxis.setDrawLabels(false);
+        xAxis.setDrawAxisLine(false);
+        xAxis.setDrawGridLines(false);
+        axisRight.setDrawAxisLine(false);
+        axisRight.setDrawGridLines(false);
+        axisLeft.setDrawAxisLine(false);
+        axisLeft.setDrawGridLines(false);
+        axisLeft.setDrawLabels(false);
 
         nameView.setText(machineName);
         idView.setText(Integer.toString(machineId));
@@ -143,12 +158,27 @@ public class MachineFragment extends Fragment {
                 LineData lineData = new LineData(dataSet);
                 chart.setData(lineData);
                 chart.invalidate();
-
-//                System.out.println("from fragment " + machineData.size() + " " + machineData.get(0).getValues()[0]);
             }
         });
 
 
+
         return v;
     }
+
+    private void startMachine(){
+        service.controlMachine(machineId, DataService.Control.START, new DataService.VolleyResponseListener() {
+            @Override
+            public void onError(String message) {
+
+            }
+
+            @Override
+            public void onResponse(Object response) {
+                machineStatus = "RUN";
+                statusView.setText(machineStatus);
+            }
+        });
+    }
+
 }
