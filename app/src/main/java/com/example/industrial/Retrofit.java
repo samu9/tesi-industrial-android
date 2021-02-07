@@ -17,7 +17,9 @@ class APIClient {
     // TODO Barros 1 - utilizzata questa BASE_URL_FAKE per creare un servizio online che mi restituisca una Position e una lista di area, perché non avevo il tuo backend
 
     private static final String BASE_URL_FAKE = "https://run.mocky.io/v3/";
-    private static final String BASE_URL = "http://192.168.1.151:5000/";
+//    private static final String BASE_URL = "http://192.168.1.151:5000/";
+    private static String BASE_URL = "http://192.168.1.7:5000";
+
 
     private static Retrofit retrofitInstance = null;
 
@@ -25,7 +27,7 @@ class APIClient {
         if (retrofitInstance == null) {
             retrofitInstance = new Retrofit.Builder()
                     // TODO Barros 2 - dopo che hai visto come funziona, sostituisci con BASE_URL
-                    .baseUrl(BASE_URL_FAKE)
+                    .baseUrl(BASE_URL)
                     .addCallAdapterFactory(RxJava3CallAdapterFactory.create()) // serve a gestire la risposta di retrofit
                     .addConverterFactory(GsonConverterFactory.create()) // serializza e deserializza l'oggetto response
                     .build();
@@ -65,13 +67,13 @@ interface APIInterface {
     Observable<DataService.Position> getCurrentPosition();
 
     @GET("area/{id}")
-    Observable<Area> getArea(@Path("id") String id);
+    Observable<Area> getArea(@Path("id") int id);
 
     @GET("sector/{id}")
-    Observable<Sector> getSector(@Path("id") String id);
+    Observable<Sector> getSector(@Path("id") int id);
 
     @GET("sector/{id}/machines")
-    Observable<List<Machine>> getSectorMachines(@Path("id") String id);
+    Observable<List<Machine>> getSectorMachines(@Path("id") int id);
 
     @GET("machine/{id}/data")
     Observable<Machine> getMachineData(@Path("id") String id);

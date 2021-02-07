@@ -61,98 +61,130 @@ public class MainActivity extends FragmentActivity {
         APIInterface apiService = APIClient.getInstance().create(APIInterface.class);
 
         // TODO Barros 8 - faccio la chiamata getFakeCurrentPosition alla mia API, per farti vedere come funziona una singola chiamata
-        apiService.getFakeCurrentPosition()
-                // gestisco la response
-                .map(result -> Log.i("MyTag", "Area ID: " + result.area_id + " -- Sector ID: " + result.sector_id))
-                .subscribe();
+//        apiService.getFakeCurrentPosition()
+//                // gestisco la response
+//                .map(result -> Log.i("MyTag", "Area ID: " + result.area_id + " -- Sector ID: " + result.sector_id))
+//                .subscribe();
+
+//        apiService.getCurrentPosition()
+//                .flatMap(position -> apiService.getArea(position.area_id))
+//                .subscribe(area -> Log.println(Log.INFO, "DEBUG","FROM FLAT MAP " + area.getName()));
 
         // TODO Barros 9 - faccio la chiamata getFakeCurrentPosition alla mia API e successivamente uso position per fare la chiamata a quella dell'area (però ricorda che io torno la lista)
-        apiService.getFakeCurrentPosition()
+//        apiService.getFakeCurrentPosition()
+//
+//                // Creo un thread in background per fare la chiamata così allegerisco il sistema
+//                .subscribeOn(Schedulers.newThread())
+//
+//                // prendo la posizione e faccio la chiamata verso il servizio che torna l'area
+//                // ma al posto di quello che ho fatto a riga 78, avresti il codice commentato che segue
+//                // .flatMap(position -> apiService.getArea(position.id))
+//                .flatMap(position -> apiService.getFakeAreas())
+//
+//                // ritorno sul main thread, altrimenti non posso cambiare la UI
+//                .observeOn(AndroidSchedulers.mainThread())
+//
+//                // gestisco gli errori
+//                .doOnError(throwable -> Log.e("MyTag", "Throwable " + throwable.getMessage()))
+//
+//                // leggo il risultato finale, ma al posto di quello che ho fatto a riga 91, avresti il codice commentato che segue
+//                // .subscribe(
+//                //      area -> footer.setText("Area: " + area.getId() + " - Settore: " + area.getName()),
+//                //      error -> Log.e("MyTag", "Throwable " + error.getMessage())
+//                // );
+//                .subscribe(
+//                        areas -> Log.i("MyTag", "Area ID: " + areas.getAreas().get(0).getId() + " -- Area Name: " + areas.getAreas().get(0).getName()),
+//                        error -> Log.e("MyTag", "Throwable " + error.getMessage())
+//                );
 
-                // Creo un thread in background per fare la chiamata così allegerisco il sistema
+        apiService.getCurrentPosition()
                 .subscribeOn(Schedulers.newThread())
-
-                // prendo la posizione e faccio la chiamata verso il servizio che torna l'area
-                // ma al posto di quello che ho fatto a riga 78, avresti il codice commentato che segue
-                // .flatMap(position -> apiService.getArea(position.id))
-                .flatMap(position -> apiService.getFakeAreas())
-
-                // ritorno sul main thread, altrimenti non posso cambiare la UI
+                .flatMap(position -> {
+                    area_id = position.area_id;
+                    sector_id = position.sector_id;
+                    return apiService.getArea(area_id);
+                })
+                .flatMap(area -> {
+                    footerTexts[0] = area.getName();
+                    return apiService.getSector(sector_id);
+                })
+                .flatMap(sector -> {
+                    footerTexts[1] = sector.getName();
+                    footer.setText("Area: " + footerTexts[0]+ " - Settore: " + footerTexts[1]);
+                    return apiService.getSectorMachines(sector_id);
+                })
                 .observeOn(AndroidSchedulers.mainThread())
-
-                // gestisco gli errori
-                .doOnError(throwable -> Log.e("MyTag", "Throwable " + throwable.getMessage()))
-
-                // leggo il risultato finale, ma al posto di quello che ho fatto a riga 91, avresti il codice commentato che segue
-                // .subscribe(
-                //      area -> footer.setText("Area: " + area.getId() + " - Settore: " + area.getName()),
-                //      error -> Log.e("MyTag", "Throwable " + error.getMessage())
-                // );
                 .subscribe(
-                        areas -> Log.i("MyTag", "Area ID: " + areas.getAreas().get(0).getId() + " -- Area Name: " + areas.getAreas().get(0).getName()),
+                        machines -> {
+                            for(int i = 0; i < machines.size(); i++){
+                                Log.i("DEBUG", machines.get(i).getName());
+                                fragments.add(MachineFragment.newInstance(machines.get(i).getName(), machines.get(i).getId(), machines.get(i).getStatus()));
+                            }
+
+                            screenSlidePagerAdapter.notifyDataSetChanged();
+                        },
                         error -> Log.e("MyTag", "Throwable " + error.getMessage())
                 );
 
-
-        service.getCurrentPosition(new DataService.VolleyResponseListener() {
-            @Override
-            public void onError(String message) {
-
-            }
-
-            @Override
-            public void onResponse(Object response) {
-                DataService.Position position = (DataService.Position) response;
-                area_id = position.area_id;
-                sector_id = position.sector_id;
-
-                service.getArea(area_id, new DataService.VolleyResponseListener() {
-                    @Override
-                    public void onError(String message) {
-
-                    }
-
-                    @Override
-                    public void onResponse(Object response) {
-                        Area area = (Area)response;
-                        footerTexts[0] = area.getName();
-
-                        service.getSector(sector_id, new DataService.VolleyResponseListener() {
-                            @Override
-                            public void onError(String message) {
-
-                            }
-
-                            @Override
-                            public void onResponse(Object response) {
-                                Sector sector = (Sector) response;
-                                footerTexts[1] = sector.getName();
-                                footer.setText("Area: " + footerTexts[0]+ " - Settore: " + footerTexts[1]);
-                            }
-                        });
-                    }
-                });
-
-                service.getSectorMachines(sector_id, new DataService.VolleyResponseListener() {
-                    @Override
-                    public void onError(String message) {
-
-                    }
-
-                    @Override
-                    public void onResponse(Object response) {
-                        machines = (ArrayList<Machine>) response;
-
-                        for(int i = 0; i < machines.size(); i++){
-                            fragments.add(MachineFragment.newInstance(machines.get(i).getName(), machines.get(i).getId(), machines.get(i).getStatus()));
-                        }
-                        screenSlidePagerAdapter.notifyDataSetChanged();
-
-//                getSupportFragmentManager().beginTransaction().replace(R.id.body_layout, fragments.get(0)).commit();
-                    }
-                });
-            }
-        });
+//        service.getCurrentPosition(new DataService.VolleyResponseListener() {
+//            @Override
+//            public void onError(String message) {
+//
+//            }
+//
+//            @Override
+//            public void onResponse(Object response) {
+//                DataService.Position position = (DataService.Position) response;
+//                area_id = position.area_id;
+//                sector_id = position.sector_id;
+//
+//                service.getArea(area_id, new DataService.VolleyResponseListener() {
+//                    @Override
+//                    public void onError(String message) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onResponse(Object response) {
+//                        Area area = (Area)response;
+//                        footerTexts[0] = area.getName();
+//
+//                        service.getSector(sector_id, new DataService.VolleyResponseListener() {
+//                            @Override
+//                            public void onError(String message) {
+//
+//                            }
+//
+//                            @Override
+//                            public void onResponse(Object response) {
+//                                Sector sector = (Sector) response;
+//                                footerTexts[1] = sector.getName();
+//                                footer.setText("Area: " + footerTexts[0]+ " - Settore: " + footerTexts[1]);
+//                            }
+//                        });
+//                    }
+//                });
+//
+//                service.getSectorMachines(sector_id, new DataService.VolleyResponseListener() {
+//                    @Override
+//                    public void onError(String message) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onResponse(Object response) {
+//                        machines = (ArrayList<Machine>) response;
+//
+//                        for(int i = 0; i < machines.size(); i++){
+//                            fragments.add(MachineFragment.newInstance(machines.get(i).getName(), machines.get(i).getId(), machines.get(i).getStatus()));
+//                        }
+//                        screenSlidePagerAdapter.notifyDataSetChanged();
+//
+////                getSupportFragmentManager().beginTransaction().replace(R.id.body_layout, fragments.get(0)).commit();
+//                    }
+//                });
+//            }
+//        });
 
 
     }

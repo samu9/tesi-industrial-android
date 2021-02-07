@@ -38,8 +38,8 @@ public class DataService {
             this.sector_id = sector_id;
         }
     }
-    private static String BASE_URL = "http://192.168.1.151:5000";
-//    private static String BASE_URL = "http://192.168.1.7:5000";
+//    private static String BASE_URL = "http://192.168.1.151:5000";
+    private static String BASE_URL = "http://192.168.1.7:5000";
     private Context context;
 
     public interface VolleyResponseListener {
