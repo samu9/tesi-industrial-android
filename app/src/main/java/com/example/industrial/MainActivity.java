@@ -98,7 +98,7 @@ public class MainActivity extends FragmentActivity {
 //                );
 
         apiService.getCurrentPosition()
-                .subscribeOn(Schedulers.newThread())
+                .subscribeOn(Schedulers.io())
                 .flatMap(position -> {
                     area_id = position.area_id;
                     sector_id = position.sector_id;
@@ -119,73 +119,13 @@ public class MainActivity extends FragmentActivity {
                             for(int i = 0; i < machines.size(); i++){
                                 Log.i("DEBUG", machines.get(i).getName());
                                 fragments.add(MachineFragment.newInstance(machines.get(i).getName(), machines.get(i).getId(), machines.get(i).getStatus()));
-                            }
 
+                            }
                             screenSlidePagerAdapter.notifyDataSetChanged();
+//                            getSupportFragmentManager().beginTransaction().replace(R.id.body_layout, fragments.get(2)).commit();
                         },
                         error -> Log.e("MyTag", "Throwable " + error.getMessage())
                 );
-
-//        service.getCurrentPosition(new DataService.VolleyResponseListener() {
-//            @Override
-//            public void onError(String message) {
-//
-//            }
-//
-//            @Override
-//            public void onResponse(Object response) {
-//                DataService.Position position = (DataService.Position) response;
-//                area_id = position.area_id;
-//                sector_id = position.sector_id;
-//
-//                service.getArea(area_id, new DataService.VolleyResponseListener() {
-//                    @Override
-//                    public void onError(String message) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onResponse(Object response) {
-//                        Area area = (Area)response;
-//                        footerTexts[0] = area.getName();
-//
-//                        service.getSector(sector_id, new DataService.VolleyResponseListener() {
-//                            @Override
-//                            public void onError(String message) {
-//
-//                            }
-//
-//                            @Override
-//                            public void onResponse(Object response) {
-//                                Sector sector = (Sector) response;
-//                                footerTexts[1] = sector.getName();
-//                                footer.setText("Area: " + footerTexts[0]+ " - Settore: " + footerTexts[1]);
-//                            }
-//                        });
-//                    }
-//                });
-//
-//                service.getSectorMachines(sector_id, new DataService.VolleyResponseListener() {
-//                    @Override
-//                    public void onError(String message) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onResponse(Object response) {
-//                        machines = (ArrayList<Machine>) response;
-//
-//                        for(int i = 0; i < machines.size(); i++){
-//                            fragments.add(MachineFragment.newInstance(machines.get(i).getName(), machines.get(i).getId(), machines.get(i).getStatus()));
-//                        }
-//                        screenSlidePagerAdapter.notifyDataSetChanged();
-//
-////                getSupportFragmentManager().beginTransaction().replace(R.id.body_layout, fragments.get(0)).commit();
-//                    }
-//                });
-//            }
-//        });
-
 
     }
 

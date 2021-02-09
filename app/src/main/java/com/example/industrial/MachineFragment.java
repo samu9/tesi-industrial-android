@@ -54,6 +54,8 @@ public class MachineFragment extends Fragment {
 
     DataService service = new DataService(getContext());
 
+    APIInterface apiService;
+
     public MachineFragment() {
         // Required empty public constructor
     }
@@ -96,6 +98,8 @@ public class MachineFragment extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_machine, container, false);
 
+        apiService = APIClient.getInstance().create(APIInterface.class);
+
         nameView = v.findViewById(R.id.machine_name);
         idView = v.findViewById(R.id.machine_id);
         statusView = v.findViewById(R.id.machine_status);
@@ -130,16 +134,9 @@ public class MachineFragment extends Fragment {
 
         List<Entry> entries = new ArrayList<>();
 
-        service.getMachineData(machineId, new DataService.VolleyResponseListener() {
-            @Override
-            public void onError(String message) {
-
-            }
-
-            @Override
-            public void onResponse(Object response) {
-
-                machineData.addAll((ArrayList<MachineData>) response);
+        apiService.getMachineData(machineId)
+                .subscribe(machineDataResponse -> {
+                    machineData.addAll((ArrayList<MachineData>) machineDataResponse);
                 adapter.notifyDataSetChanged();
 
                 if(machineData.size() > 0) {
@@ -158,10 +155,7 @@ public class MachineFragment extends Fragment {
                 LineData lineData = new LineData(dataSet);
                 chart.setData(lineData);
                 chart.invalidate();
-            }
-        });
-
-
+                });
 
         return v;
     }

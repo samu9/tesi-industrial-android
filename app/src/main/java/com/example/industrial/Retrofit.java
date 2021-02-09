@@ -3,6 +3,7 @@ package com.example.industrial;
 import com.example.industrial.models.Area;
 import com.example.industrial.models.Areas;
 import com.example.industrial.models.Machine;
+import com.example.industrial.models.MachineData;
 import com.example.industrial.models.Sector;
 import java.util.List;
 import io.reactivex.rxjava3.core.Observable;
@@ -17,8 +18,8 @@ class APIClient {
     // TODO Barros 1 - utilizzata questa BASE_URL_FAKE per creare un servizio online che mi restituisca una Position e una lista di area, perché non avevo il tuo backend
 
     private static final String BASE_URL_FAKE = "https://run.mocky.io/v3/";
-//    private static final String BASE_URL = "http://192.168.1.151:5000/";
-    private static String BASE_URL = "http://192.168.1.7:5000";
+    private static final String BASE_URL = "http://192.168.1.151:5000/";
+//    private static String BASE_URL = "http://192.168.1.7:5000";
 
 
     private static Retrofit retrofitInstance = null;
@@ -76,7 +77,7 @@ interface APIInterface {
     Observable<List<Machine>> getSectorMachines(@Path("id") int id);
 
     @GET("machine/{id}/data")
-    Observable<Machine> getMachineData(@Path("id") String id);
+    Observable<List<MachineData>> getMachineData(@Path("id") int id);
 
 //    @GET("/machine/{id}/{control}")
 //    Observable<> getMachineData(@Path("id") String id, @Path("control") String control);
