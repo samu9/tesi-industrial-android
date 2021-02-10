@@ -55,57 +55,18 @@ public class MainActivity extends FragmentActivity {
 
         timestamp.setText("timestamp");
 
-
-
-        // TODO Barros 7 - Instanzio retrofit
         APIInterface apiService = APIClient.getInstance().create(APIInterface.class);
-
-        // TODO Barros 8 - faccio la chiamata getFakeCurrentPosition alla mia API, per farti vedere come funziona una singola chiamata
-//        apiService.getFakeCurrentPosition()
-//                // gestisco la response
-//                .map(result -> Log.i("MyTag", "Area ID: " + result.area_id + " -- Sector ID: " + result.sector_id))
-//                .subscribe();
-
-//        apiService.getCurrentPosition()
-//                .flatMap(position -> apiService.getArea(position.area_id))
-//                .subscribe(area -> Log.println(Log.INFO, "DEBUG","FROM FLAT MAP " + area.getName()));
-
-        // TODO Barros 9 - faccio la chiamata getFakeCurrentPosition alla mia API e successivamente uso position per fare la chiamata a quella dell'area (però ricorda che io torno la lista)
-//        apiService.getFakeCurrentPosition()
-//
-//                // Creo un thread in background per fare la chiamata così allegerisco il sistema
-//                .subscribeOn(Schedulers.newThread())
-//
-//                // prendo la posizione e faccio la chiamata verso il servizio che torna l'area
-//                // ma al posto di quello che ho fatto a riga 78, avresti il codice commentato che segue
-//                // .flatMap(position -> apiService.getArea(position.id))
-//                .flatMap(position -> apiService.getFakeAreas())
-//
-//                // ritorno sul main thread, altrimenti non posso cambiare la UI
-//                .observeOn(AndroidSchedulers.mainThread())
-//
-//                // gestisco gli errori
-//                .doOnError(throwable -> Log.e("MyTag", "Throwable " + throwable.getMessage()))
-//
-//                // leggo il risultato finale, ma al posto di quello che ho fatto a riga 91, avresti il codice commentato che segue
-//                // .subscribe(
-//                //      area -> footer.setText("Area: " + area.getId() + " - Settore: " + area.getName()),
-//                //      error -> Log.e("MyTag", "Throwable " + error.getMessage())
-//                // );
-//                .subscribe(
-//                        areas -> Log.i("MyTag", "Area ID: " + areas.getAreas().get(0).getId() + " -- Area Name: " + areas.getAreas().get(0).getName()),
-//                        error -> Log.e("MyTag", "Throwable " + error.getMessage())
-//                );
 
         apiService.getCurrentPosition()
                 .subscribeOn(Schedulers.io())
-                .flatMap(position -> {
-                    area_id = position.area_id;
-                    sector_id = position.sector_id;
+                .flatMap(location -> {
+                    area_id = location.area_id;
+                    sector_id = location.sector_id;
                     return apiService.getArea(area_id);
                 })
                 .flatMap(area -> {
-                    footerTexts[0] = area.getName();
+                    Log.i("test", "sectors count:" + area.getSectors_count());
+                    footerTexts[0] = area.getName() + " - " + area.getSectors_count();
                     return apiService.getSector(sector_id);
                 })
                 .flatMap(sector -> {
@@ -122,7 +83,6 @@ public class MainActivity extends FragmentActivity {
 
                             }
                             screenSlidePagerAdapter.notifyDataSetChanged();
-//                            getSupportFragmentManager().beginTransaction().replace(R.id.body_layout, fragments.get(2)).commit();
                         },
                         error -> Log.e("MyTag", "Throwable " + error.getMessage())
                 );
