@@ -2,12 +2,19 @@
 <resources>
 
     <!-- The recommended margin for the top, left, and right edges of a card. -->
-    <dimen name="glass_card_margin">40dp</dimen>
+    <dimen name="glass_card_margin">30dp</dimen>
 
     <!-- The recommended margin between the bottom of the card and the footer. -->
     <dimen name="glass_card_footer_margin">50dp</dimen>
 
     <!-- The recommended margin for the left column of the two-column card. -->
     <dimen name="glass_card_two_column_margin">30dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+
+    <!-- The recommended size for the menu text size. -->
+    <dimen name="menu_text_size">64sp</dimen>
+
+    <!-- The recommended menu text margin. -->
+    <dimen name="menu_text_margin">16dp</dimen>
 
 </resources>

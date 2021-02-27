@@ -17,6 +17,19 @@ public class MachineData {
         return values;
     }
 
+
+    public int getSpeed(){
+        return values[0];
+    }
+
+    public int getEfficiency(){
+        return values[1];
+    }
+
+    public int getTemp(){
+        return values[2];
+    }
+
     public String getTimestamp() {
         return timestamp;
     }

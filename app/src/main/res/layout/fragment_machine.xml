@@ -1,102 +1,167 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    app:layout_constraintBottom_toBottomOf="parent">
 
-    <TextView
-        android:id="@+id/name_label"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="NAME"
-        android:textSize="12sp"
-        app:layout_constraintBottom_toBottomOf="@+id/machine_name"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/machine_name"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="16dp"
-        android:text="Machine name"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@+id/status_label"
-        app:layout_constraintStart_toEndOf="@+id/name_label"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/status_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:text="STATUS"
-        android:textSize="12sp"
-        app:layout_constraintBottom_toBottomOf="@+id/machine_name"
-        app:layout_constraintEnd_toStartOf="@+id/machine_status"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/machine_status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:text="TextView"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/machine_name"
-        app:layout_constraintEnd_toStartOf="@+id/id_label"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/id_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:text="ID"
-        android:textSize="12sp"
-        app:layout_constraintBottom_toBottomOf="@+id/machine_name"
-        app:layout_constraintEnd_toStartOf="@+id/machine_id"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/machine_id"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:text="TextView"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/machine_name"
+        android:paddingBottom="8dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/machine_data_list"
+        <TextView
+            android:id="@+id/name_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="NAME"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/machine_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Machine name"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/status_label"
+            app:layout_constraintStart_toEndOf="@+id/name_label" />
+
+        <TextView
+            android:id="@+id/status_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="STATUS"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/machine_status"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/machine_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:text="TextView"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/id_label"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/id_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="ID"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/machine_id"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/machine_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TextView"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:id="@+id/value1_linear_layout"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/machine_chart"
-        app:layout_constraintHorizontal_weight="0.15"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@id/value3_linear_layout"
+        app:layout_constraintEnd_toStartOf="@+id/value2_linear_layout"
+        app:layout_constraintHeight_percent="0.6"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/machine_name">
+        app:layout_constraintTop_toBottomOf="@id/header"
+        app:layout_constraintWidth_percent="0.3">
 
-    </androidx.recyclerview.widget.RecyclerView>
+        <TextView
+            android:id="@+id/value1_graph_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="RPM" />
 
-    <com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/machine_chart"
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/value1_chart"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            android:id="@+id/value1_chart"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingHorizontal="4dp">
+
+        </com.github.mikephil.charting.charts.BarChart>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/value2_linear_layout"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="8dp"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_weight="0.85"
-        app:layout_constraintStart_toEndOf="@+id/machine_data_list"
-        app:layout_constraintTop_toBottomOf="@+id/machine_name">
+        app:layout_constraintStart_toEndOf="@id/value1_linear_layout"
+        app:layout_constraintTop_toBottomOf="@id/header">
 
-    </com.github.mikephil.charting.charts.LineChart>
+        <TextView
+            android:id="@+id/value2_graph_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Efficiency" />
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/value2_chart"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingHorizontal="0dp">
+
+        </com.github.mikephil.charting.charts.LineChart>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/value3_linear_layout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/value2_linear_layout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/value1_linear_layout">
+
+        <TextView
+            android:id="@+id/value3_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Temp." />
+
+        <TextView
+            android:id="@+id/value3_number"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="TextView"
+            android:textAlignment="center"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

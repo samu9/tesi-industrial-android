@@ -139,9 +139,9 @@ public class DataService {
                             try {
                                 JSONObject machineObject = response.getJSONObject(i);
 
-                                Machine machine = new Machine(machineObject.getString("name"),
-                                        machineObject.getInt("id"), 1, machineObject.getString("status"));
-                                machines.add(machine);
+//                                Machine machine = new Machine(machineObject.getString("name"),
+//                                        machineObject.getInt("id"), 1, machineObject.getString("status"));
+//                                machines.add(machine);
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }

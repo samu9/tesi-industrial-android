@@ -17,8 +17,9 @@ import retrofit2.http.Path;
 
 class APIClient {
 
-    private static final String BASE_URL = "http://192.168.1.151:5000/";
+//    private static final String BASE_URL = "http://192.168.1.151:5000/";
 //    private static String BASE_URL = "http://192.168.1.7:5000";
+    private static String BASE_URL = "http://10.0.2.2:5000";
 
 
     private static Retrofit retrofitInstance = null;
@@ -36,6 +37,7 @@ class APIClient {
 }
 
 interface APIInterface {
+    int UPDATE_DELAY = 1;
 
     @GET("position")
     Observable<Location> getCurrentPosition();
@@ -51,6 +53,9 @@ interface APIInterface {
 
     @GET("machine/{id}/data")
     Observable<List<MachineData>> getMachineData(@Path("id") int id);
+
+    @GET("machine/{id}/data/update")
+    Observable<MachineData> getMachineDataUpdate(@Path("id") int id);
 
     @POST("machine/{id}/{command}")
     void commandMachine(@Path("id") int id, @Path("command") String command);
