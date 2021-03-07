@@ -3,8 +3,7 @@ plugins {
 }
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion "30.0.2"
+    compileSdkVersion 28
 
     defaultConfig {
         applicationId "com.example.industrial"

@@ -18,10 +18,12 @@ package com.example.industrial.menu;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -59,15 +61,24 @@ public class MenuActivity extends BaseActivity implements GlassGestureDetector.O
    * Key for the menu.
    */
   public static final String EXTRA_MENU_KEY = "menu_key";
+  public static final String EXTRA_MACHINE_KEY = "machine";
 
   private MenuAdapter adapter;
   private List<GlassMenuItem> menuItems = new ArrayList<>();
   private int currentMenuItemIndex;
+  private int machineId;
 
   @Override
   protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.menu_layout);
+
+    machineId = getIntent().getIntExtra(EXTRA_MACHINE_KEY, -1);
+
+    TextView test = findViewById(R.id.test);
+    test.setText("TEST: " + machineId);
+
+    Log.i("MenuActivity","menu activity on machine id " + machineId);
     final RecyclerView recyclerView = findViewById(R.id.menuRecyclerView);
     adapter = new MenuAdapter(menuItems);
     final LayoutManager layoutManager = new LinearLayoutManager(this,
@@ -89,13 +100,15 @@ public class MenuActivity extends BaseActivity implements GlassGestureDetector.O
         currentMenuItemIndex = layoutManager.getPosition(foundView);
       }
     });
+    Log.i("MenuActivity", "Created activity");
   }
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
     int menuResource = getIntent()
         .getIntExtra(EXTRA_MENU_KEY, EXTRA_MENU_ITEM_DEFAULT_VALUE);
-    menuResource = R.menu.main_menu;
+
+    Log.i("MenuActivity","creating options menu");
     if (menuResource != EXTRA_MENU_ITEM_DEFAULT_VALUE) {
       final MenuInflater inflater = getMenuInflater();
       inflater.inflate(menuResource, menu);
@@ -105,6 +118,7 @@ public class MenuActivity extends BaseActivity implements GlassGestureDetector.O
         menuItems.add(
             new GlassMenuItem(menuItem.getItemId(), menuItem.getIcon(),
                 menuItem.getTitle().toString()));
+        Log.i("MenuActivity",menuItem.getTitle().toString());
         adapter.notifyDataSetChanged();
       }
     }
@@ -116,7 +130,8 @@ public class MenuActivity extends BaseActivity implements GlassGestureDetector.O
     switch (gesture) {
       case TAP:
         final Intent intent = new Intent();
-        intent.putExtra(EXTRA_MENU_ITEM_ID_KEY, menuItems.get(currentMenuItemIndex).getId());
+//        intent.putExtra(EXTRA_MENU_ITEM_ID_KEY, menuItems.get(currentMenuItemIndex).getId());
+        intent.putExtra(EXTRA_MENU_ITEM_ID_KEY, R.id.add);
         setResult(RESULT_OK, intent);
         finish();
         return true;

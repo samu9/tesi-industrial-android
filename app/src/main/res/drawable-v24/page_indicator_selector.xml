@@ -14,9 +14,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-  <item android:id="@+id/add" android:icon="@drawable/ic_add" android:title="@string/add"/>
-  <item android:id="@+id/save" android:icon="@drawable/ic_save" android:title="@string/save"/>
-  <item android:id="@+id/delete" android:icon="@drawable/ic_delete" android:title="@string/delete"/>
-</menu>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+  <item android:drawable="@drawable/indicator_selected_dot" android:state_selected="true"/>
+  <item android:drawable="@drawable/indicator_dot"/>
+</selector>

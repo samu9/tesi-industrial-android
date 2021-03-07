@@ -71,7 +71,7 @@ public class MainActivity extends BaseActivity {
                         machines -> {
                             for(int i = 0; i < machines.size(); i++){
                                 Log.i("DEBUG", machines.get(i).getName());
-                                fragments.add(MachineFragment.newInstance(machines.get(i)));
+                                fragments.add(MachineFragment.newInstance(machines.get(i), R.menu.main_menu));
 
                             }
                             screenSlidePagerAdapter.notifyDataSetChanged();
@@ -82,6 +82,20 @@ public class MainActivity extends BaseActivity {
                         error -> Log.e("MyTag", "Throwable " + error.getMessage())
                 );
 
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.i("MainActivity", "onResume");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        Log.i("MainActivity", "onPause");
     }
 
     @Override

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -40,12 +41,13 @@ import java.util.concurrent.TimeUnit;
  * Use the {@link MachineFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MachineFragment extends Fragment implements OnSingleTapUpListener {
+public class MachineFragment extends BaseFragment {
 
     // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String MACHINE = "machine";
-    private static final int REQUEST_CODE = 200;
+    protected static final String MENU_KEY = "menu_key";
+
+    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 
     // TODO: Rename and change types of parameters
     private Machine machine;
@@ -80,10 +82,11 @@ public class MachineFragment extends Fragment implements OnSingleTapUpListener {
      * @return A new instance of fragment MachineFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static MachineFragment newInstance(Serializable machine) {
+    public static MachineFragment newInstance(Serializable machine, int menu) {
         MachineFragment fragment = new MachineFragment();
         Bundle args = new Bundle();
         args.putSerializable(MACHINE, machine);
+        args.putInt(MENU_KEY, menu);
 
         fragment.setArguments(args);
         return fragment;
@@ -93,10 +96,8 @@ public class MachineFragment extends Fragment implements OnSingleTapUpListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-//            machineName = getArguments().getString(MACHINE_NAME);
-//            machineId = getArguments().getInt(MACHINE_ID);
-//            machineStatus = getArguments().getString(MACHINE_STATUS);
             machine = (Machine) getArguments().getSerializable(MACHINE);
+
         }
 
         machineData = new ArrayList<>();
@@ -124,8 +125,6 @@ public class MachineFragment extends Fragment implements OnSingleTapUpListener {
         idView.setText(Integer.toString(machine.getId()));
         statusView.setText(machine.getStatus());
 
-//        goToDangerMode();
-
         apiService.getMachineData(machine.getId())
 //                .repeatWhen(completed -> completed.delay(APIInterface.UPDATE_DELAY, TimeUnit.SECONDS))
                 .subscribe(machineDataResponse -> {
@@ -140,10 +139,40 @@ public class MachineFragment extends Fragment implements OnSingleTapUpListener {
                 chartsUpdate();
 
                 });
-        apiService.getMachineDataUpdate(machine.getId())
+
+//        startGetData();
+
+        return v;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+//        startGetData();
+    }
+
+
+    @Override
+    public void onSingleTapUp() {
+        if (getArguments() != null) {
+            int menu = getArguments().getInt(MENU_KEY, MENU_DEFAULT_VALUE);
+            Log.i("MachineFragment", "TAP - menu id: " + menu);
+            if (menu != MENU_DEFAULT_VALUE) {
+                Intent intent = new Intent(getActivity(), MenuActivity.class);
+                intent.putExtra(MENU_KEY, menu);
+                intent.putExtra(MACHINE, machine.getId());
+                startActivityForResult(intent, REQUEST_CODE);
+            }
+        }
+    }
+
+    private void startGetData(){
+                apiService.getMachineDataUpdate(machine.getId())
 //                .delay(APIInterface.UPDATE_DELAY, TimeUnit.SECONDS)
                 .repeatWhen(completed ->  completed.delay(1000, TimeUnit.MILLISECONDS))
                 .subscribe(machineDataUpdate -> {
+                    Log.i("data", Integer.toString(machine.getId()));
                     if(!machine.checkSpeed(machineDataUpdate.getSpeed())){
                         Log.i("DANGER", "speed: " + machineDataUpdate.getSpeed());
 //                        goToDangerMode();
@@ -167,9 +196,7 @@ public class MachineFragment extends Fragment implements OnSingleTapUpListener {
                         entries2.remove(0);
                         machineData.remove(0);
                     }
-//                    if(machine.getId() == 1){
-//                        Log.i("debug", dataCounter + " - " + machineDataUpdate.getValues()[0]);
-//                    }
+
                     entries1.add(new BarEntry(dataCounter, machineDataUpdate.getValues()[0]));
                     entries2.add(new Entry(dataCounter, machineDataUpdate.getValues()[1]));
                     machineData.add(machineDataUpdate);
@@ -179,28 +206,6 @@ public class MachineFragment extends Fragment implements OnSingleTapUpListener {
 
                     value3.setText(Integer.toString(machineDataUpdate.getValues()[2]));
                 });
-
-        return v;
-    }
-
-    @Override
-    public void onSingleTapUp() {
-        Log.i("D", "TAP");
-//        Intent intent = new Intent(getActivity(), DangerActivity.class);
-//        intent.putExtra(MENU_KEY, menu);
-//        startActivityForResult(intent, REQUEST_CODE);
-        Intent intent = new Intent(getActivity(), MenuActivity.class);
-//        intent.putExtra(MENU_KEY, menu);
-        startActivityForResult(intent, REQUEST_CODE);
-
-//        if (getArguments() != null) {
-//            int menu = getArguments().getInt(MENU_KEY, MENU_DEFAULT_VALUE);
-//            if (menu != MENU_DEFAULT_VALUE) {
-//            Intent intent = new Intent(getActivity(), MenuActivity.class);
-//                intent.putExtra(MENU_KEY, menu);
-//            startActivityForResult(intent, REQUEST_CODE);
-//            }
-//        }
     }
 
     private void startMachine(){

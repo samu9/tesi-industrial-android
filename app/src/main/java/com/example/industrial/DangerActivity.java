@@ -2,6 +2,7 @@ package com.example.industrial;
 
 import android.os.Bundle;
 
+import com.example.industrial.glass.GlassGestureDetector;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -11,7 +12,7 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.view.View;
 
-public class DangerActivity extends FragmentActivity {
+public class DangerActivity extends BaseActivity implements GlassGestureDetector.OnGestureListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
