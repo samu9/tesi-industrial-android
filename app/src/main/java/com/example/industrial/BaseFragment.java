@@ -73,20 +73,8 @@ public abstract class BaseFragment extends Fragment implements OnSingleTapUpList
     if (requestCode == REQUEST_CODE && resultCode == RESULT_OK && data != null) {
       final int id = data.getIntExtra(MenuActivity.EXTRA_MENU_ITEM_ID_KEY,
           MenuActivity.EXTRA_MENU_ITEM_DEFAULT_VALUE);
-      String selectedOption = "";
-      switch (id) {
-        case R.id.add:
-          selectedOption = getString(R.string.add);
-          break;
-        case R.id.save:
-          selectedOption = getString(R.string.save);
-          break;
-        case R.id.delete:
-          selectedOption = getString(R.string.delete);
-          break;
-      }
-      Toast.makeText(getActivity(), selectedOption + " option selected.", Toast.LENGTH_SHORT)
-          .show();
+
+
     }
   }
 }

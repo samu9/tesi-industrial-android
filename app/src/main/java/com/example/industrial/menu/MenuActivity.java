@@ -78,7 +78,7 @@ public class MenuActivity extends BaseActivity implements GlassGestureDetector.O
     TextView test = findViewById(R.id.test);
     test.setText("TEST: " + machineId);
 
-    Log.i("MenuActivity","menu activity on machine id " + machineId);
+    Log.d("MenuActivity","menu activity on machine id " + machineId);
     final RecyclerView recyclerView = findViewById(R.id.menuRecyclerView);
     adapter = new MenuAdapter(menuItems);
     final LayoutManager layoutManager = new LinearLayoutManager(this,
@@ -100,7 +100,7 @@ public class MenuActivity extends BaseActivity implements GlassGestureDetector.O
         currentMenuItemIndex = layoutManager.getPosition(foundView);
       }
     });
-    Log.i("MenuActivity", "Created activity");
+    Log.d("MenuActivity", "Created");
   }
 
   @Override
@@ -108,7 +108,7 @@ public class MenuActivity extends BaseActivity implements GlassGestureDetector.O
     int menuResource = getIntent()
         .getIntExtra(EXTRA_MENU_KEY, EXTRA_MENU_ITEM_DEFAULT_VALUE);
 
-    Log.i("MenuActivity","creating options menu");
+    Log.d("MenuActivity","creating options menu");
     if (menuResource != EXTRA_MENU_ITEM_DEFAULT_VALUE) {
       final MenuInflater inflater = getMenuInflater();
       inflater.inflate(menuResource, menu);
@@ -118,7 +118,7 @@ public class MenuActivity extends BaseActivity implements GlassGestureDetector.O
         menuItems.add(
             new GlassMenuItem(menuItem.getItemId(), menuItem.getIcon(),
                 menuItem.getTitle().toString()));
-        Log.i("MenuActivity",menuItem.getTitle().toString());
+        Log.d("MenuActivity",menuItem.getTitle().toString());
         adapter.notifyDataSetChanged();
       }
     }
@@ -130,8 +130,8 @@ public class MenuActivity extends BaseActivity implements GlassGestureDetector.O
     switch (gesture) {
       case TAP:
         final Intent intent = new Intent();
-//        intent.putExtra(EXTRA_MENU_ITEM_ID_KEY, menuItems.get(currentMenuItemIndex).getId());
-        intent.putExtra(EXTRA_MENU_ITEM_ID_KEY, R.id.add);
+        intent.putExtra(EXTRA_MENU_ITEM_ID_KEY, menuItems.get(currentMenuItemIndex).getId());
+
         setResult(RESULT_OK, intent);
         finish();
         return true;

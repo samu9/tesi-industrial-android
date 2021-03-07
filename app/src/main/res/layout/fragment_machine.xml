@@ -4,6 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginStart="8dp"
     app:layout_constraintBottom_toBottomOf="parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -74,11 +76,29 @@
             android:id="@+id/machine_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
             android:text="TextView"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/danger_text"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.523" />
+
+        <TextView
+            android:id="@+id/danger_text"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:background="@drawable/danger_box"
+            android:drawablePadding="8dp"
+            android:paddingHorizontal="4dp"
+            android:text="DANGER"
+            android:textColor="@android:color/holo_red_light"
+            android:textSize="24sp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
@@ -88,7 +108,7 @@
         android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@id/value3_linear_layout"
         app:layout_constraintEnd_toStartOf="@+id/value2_linear_layout"
-        app:layout_constraintHeight_percent="0.6"
+        app:layout_constraintHeight_percent="0.7"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/header"
         app:layout_constraintWidth_percent="0.3">

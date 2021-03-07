@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.industrial.adapters.MachineDataAdapter;
 import com.example.industrial.menu.MenuActivity;
@@ -36,6 +37,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static android.app.Activity.RESULT_OK;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link MachineFragment#newInstance} factory method to
@@ -54,7 +57,7 @@ public class MachineFragment extends BaseFragment {
 
     ArrayList<MachineData> machineData;
 
-    TextView statusView, idView, nameView, value3;
+    TextView statusView, idView, nameView, value3, dangerText;
 
     LineChart chart2;
     BarChart chart1;
@@ -121,6 +124,8 @@ public class MachineFragment extends BaseFragment {
 
         value3 = v.findViewById(R.id.value3_number);
 
+        dangerText = v.findViewById(R.id.danger_text);
+
         nameView.setText(machine.getName());
         idView.setText(Integer.toString(machine.getId()));
         statusView.setText(machine.getStatus());
@@ -140,7 +145,7 @@ public class MachineFragment extends BaseFragment {
 
                 });
 
-//        startGetData();
+        startGetData();
 
         return v;
     }
@@ -164,6 +169,33 @@ public class MachineFragment extends BaseFragment {
                 intent.putExtra(MACHINE, machine.getId());
                 startActivityForResult(intent, REQUEST_CODE);
             }
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.i("BaseFragment", "ActivityResult: " + requestCode + " - " + resultCode);
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            final int id = data.getIntExtra(MenuActivity.EXTRA_MENU_ITEM_ID_KEY,
+                    MenuActivity.EXTRA_MENU_ITEM_DEFAULT_VALUE);
+            String selectedOption = "";
+            switch (id) {
+                case R.id.start:
+                    selectedOption = getString(R.string.start);
+                    dangerText.setVisibility(View.GONE);
+                    break;
+                case R.id.pause:
+                    selectedOption = getString(R.string.pause);
+                    break;
+                case R.id.stop:
+                    selectedOption = getString(R.string.stop);
+                    dangerText.setVisibility(View.VISIBLE);
+                    break;
+
+            }
+            Toast.makeText(getActivity(), selectedOption + " option selected.", Toast.LENGTH_SHORT)
+                    .show();
         }
     }
 
