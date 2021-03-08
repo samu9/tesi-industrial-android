@@ -18,7 +18,7 @@ import retrofit2.http.Path;
 class APIClient {
 
 //    private static String BASE_URL = "http://10.0.2.2:5000";
-    private static String BASE_URL = "http://207.154.240.44:5000/";
+    private static String BASE_URL = "http://207.154.240.44:5000";
 
 
     private static Retrofit retrofitInstance = null;
