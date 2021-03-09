@@ -5,6 +5,13 @@ import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 
 public class Machine implements Serializable {
+
+    // Machine status constants
+    public static String START = "START";
+    public static String PAUSE = "PAUSE";
+    public static String STOP = "STOP";
+    public static String HALT = "HALT";
+
     private String name;
     private int id;
     private int sectorId;
