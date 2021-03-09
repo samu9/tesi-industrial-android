@@ -183,13 +183,21 @@ public class MachineFragment extends BaseFragment {
             switch (id) {
                 case R.id.start:
                     selectedOption = getString(R.string.start);
+                    updateMachineStatus(Machine.START);
+                    if(!started){
+                        started = true;
+                        startGetData();
+                    }
                     dangerText.setVisibility(View.GONE);
                     break;
                 case R.id.pause:
+                    updateMachineStatus(Machine.PAUSE);
+                    started = false;
                     selectedOption = getString(R.string.pause);
                     break;
                 case R.id.stop:
                     selectedOption = getString(R.string.stop);
+                    updateMachineStatus(Machine.STOP);
                     dangerText.setVisibility(View.VISIBLE);
                     break;
 
@@ -197,6 +205,12 @@ public class MachineFragment extends BaseFragment {
             Toast.makeText(getActivity(), selectedOption + " option selected.", Toast.LENGTH_SHORT)
                     .show();
         }
+    }
+
+
+    private void updateMachineStatus(String status){
+        machine.setStatus(status);
+        statusView.setText(status);
     }
 
     private void startGetData(){
