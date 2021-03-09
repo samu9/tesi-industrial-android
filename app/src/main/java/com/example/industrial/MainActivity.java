@@ -3,6 +3,7 @@ package com.example.industrial;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager.widget.ViewPager;
 
 
@@ -101,6 +102,14 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        FragmentManager manager = getSupportFragmentManager();
+        FragmentTransaction transaction = manager.beginTransaction();
+        for(int i = 0; i < fragments.size(); i++){
+
+            transaction.remove(fragments.get(i)).commit();
+        }
+        transaction.commit();
 
         Log.d("MainActivity", "onDestroy");
     }
