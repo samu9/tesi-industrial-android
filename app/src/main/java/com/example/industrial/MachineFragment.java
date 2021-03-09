@@ -69,8 +69,10 @@ public class MachineFragment extends BaseFragment {
     List<BarEntry> entries1 = new ArrayList<>();
     List<Entry> entries2 = new ArrayList<>();
 
+
     int dataCounter = 0;
 
+    boolean started = true;
     boolean inDanger = false;
 
     public MachineFragment() {
@@ -215,8 +217,7 @@ public class MachineFragment extends BaseFragment {
 
     private void startGetData(){
                 apiService.getMachineDataUpdate(machine.getId())
-//                .delay(APIInterface.UPDATE_DELAY, TimeUnit.SECONDS)
-                .repeatWhen(completed ->  completed.delay(1000, TimeUnit.MILLISECONDS))
+                .repeatWhen(completed ->  completed.delay(1000, TimeUnit.MILLISECONDS).takeWhile(v -> started))
                 .subscribe(machineDataUpdate -> {
                     Log.i("data", Integer.toString(machine.getId()));
                     if(!machine.checkSpeed(machineDataUpdate.getSpeed())){
