@@ -132,31 +132,13 @@ public class MachineFragment extends BaseFragment {
         idView.setText(Integer.toString(machine.getId()));
         statusView.setText(machine.getStatus());
 
-//        apiService.getMachineData(machine.getId())
-////                .repeatWhen(completed -> completed.delay(APIInterface.UPDATE_DELAY, TimeUnit.SECONDS))
-//                .subscribe(machineDataResponse -> {
-////                    dataCounter = machineDataResponse.size();
-////                    machineData.addAll((ArrayList<MachineData>) machineDataResponse);
-////
-////                for(int i = 0; i < machineData.size(); i++){
-////                    entries1.add(new BarEntry(i, machineData.get(i).getValues()[0]));
-////                    entries2.add(new Entry(i, machineData.get(i).getValues()[1]));
-////                }
-//
-//                chartsUpdate();
-//
-//                });
+        if(inDanger){
+            dangerText.setVisibility(View.VISIBLE);
+        }
 
         startGetData();
 
         return v;
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-
-//        startGetData();
     }
 
 
