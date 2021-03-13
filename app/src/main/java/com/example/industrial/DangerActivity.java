@@ -3,30 +3,73 @@ package com.example.industrial;
 import android.os.Bundle;
 
 import com.example.industrial.glass.GlassGestureDetector;
+import com.example.industrial.models.Machine;
+import com.example.industrial.models.MachineData;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentTransaction;
 
+import android.util.Log;
 import android.view.View;
+import android.widget.FrameLayout;
 
-public class DangerActivity extends BaseActivity implements GlassGestureDetector.OnGestureListener {
+import java.util.ArrayList;
+
+public class DangerActivity extends BaseActivity {
+    public static final String MACHINE_EXTRA = "machine";
+    public static final String MACHINE_DATA_EXTRA = "machine data";
+
+    FrameLayout content;
+
+    MachineFragment fragment;
+
+    Machine machine;
+    ArrayList<MachineData> machineData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_danger);
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        setTheme(R.style.DangerTheme);
+        content = findViewById(R.id.danger_content);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        machine = (Machine) getIntent().getSerializableExtra(MACHINE_EXTRA);
+//        machineData = new ArrayList<>();
+//        machineData.addAll((ArrayList<MachineData>) getIntent().getSerializableExtra(MACHINE_DATA_EXTRA));
+
+        fragment = MachineFragment.newInstance(machine, R.menu.danger_menu, null, true);
+
+        getSupportFragmentManager().beginTransaction()
+            .replace(R.id.danger_content, fragment)
+            .commit();
+        Log.i("DangerActivity", machine.getName());
+    }
+
+    @Override
+    protected void onPause() {
+        Log.i(getClass().getName(), "onPause");
+        fragment.stopData();
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        Log.i(getClass().getName(), "onResume");
+        super.onResume();
+    }
+
+    @Override
+    public boolean onGesture(GlassGestureDetector.Gesture gesture) {
+        switch (gesture) {
+            case TAP:
+                fragment.onSingleTapUp();
+                return true;
+            default:
+                return super.onGesture(gesture);
+        }
     }
 }
