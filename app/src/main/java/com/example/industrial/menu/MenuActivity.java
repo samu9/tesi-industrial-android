@@ -75,9 +75,6 @@ public class MenuActivity extends BaseActivity implements GlassGestureDetector.O
 
     machineId = getIntent().getIntExtra(EXTRA_MACHINE_KEY, -1);
 
-    TextView test = findViewById(R.id.test);
-    test.setText("TEST: " + machineId);
-
     Log.d("MenuActivity","menu activity on machine id " + machineId);
     final RecyclerView recyclerView = findViewById(R.id.menuRecyclerView);
     adapter = new MenuAdapter(menuItems);
