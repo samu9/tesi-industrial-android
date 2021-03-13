@@ -49,6 +49,7 @@ public class MachineFragment extends BaseFragment {
     // TODO: Rename parameter arguments, choose names that match
     private static final String MACHINE = "machine";
     protected static final String MENU_KEY = "menu_key";
+    protected static final String IN_DANGER_KEY = "in danger";
 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 
@@ -61,8 +62,6 @@ public class MachineFragment extends BaseFragment {
 
     LineChart chart2;
     BarChart chart1;
-
-    DataService service = new DataService(getContext());
 
     APIInterface apiService;
 
@@ -92,6 +91,7 @@ public class MachineFragment extends BaseFragment {
         Bundle args = new Bundle();
         args.putSerializable(MACHINE, machine);
         args.putInt(MENU_KEY, menu);
+        args.putBoolean(IN_DANGER_KEY, inDanger);
 
         fragment.setArguments(args);
         return fragment;
@@ -102,7 +102,7 @@ public class MachineFragment extends BaseFragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             machine = (Machine) getArguments().getSerializable(MACHINE);
-
+            inDanger = getArguments().getBoolean(IN_DANGER_KEY);
         }
 
         machineData = new ArrayList<>();
@@ -254,13 +254,13 @@ public class MachineFragment extends BaseFragment {
 
     private void chartsUpdate(){
         BarDataSet dataSet1 = new BarDataSet(entries1, "data");
-        dataSet1.setColor(Color.WHITE);
+        dataSet1.setColor(inDanger? getResources().getColor(R.color.holo_red) : Color.WHITE);
         dataSet1.setDrawValues(false);
 
         BarData barData1 = new BarData(dataSet1);
 
         LineDataSet dataSet2 = new LineDataSet(entries2, "data");
-        dataSet2.setColor(Color.WHITE);
+        dataSet2.setColor(inDanger? getResources().getColor(R.color.holo_red) : Color.WHITE);
         dataSet2.setDrawCircles(false);
         dataSet2.setDrawValues(false);
 
@@ -287,7 +287,7 @@ public class MachineFragment extends BaseFragment {
         axisRight = chart1.getAxisRight();
         axisLeft = chart1.getAxisLeft();
         xAxis.setDrawLabels(false);
-        xAxis.setTextColor(Color.WHITE);
+        xAxis.setTextColor(inDanger? getResources().getColor(R.color.holo_red) : Color.WHITE);
         xAxis.setDrawAxisLine(false);
         xAxis.setDrawGridLines(false);
 
@@ -296,7 +296,7 @@ public class MachineFragment extends BaseFragment {
         axisLeft.setDrawAxisLine(false);
         axisLeft.setDrawGridLines(true);
         axisLeft.setDrawLabels(true);
-        axisLeft.setTextColor(Color.WHITE);
+        axisLeft.setTextColor(inDanger? getResources().getColor(R.color.holo_red) : Color.WHITE);
         axisLeft.setAxisMaximum(5000);
         axisLeft.setAxisMinimum(0);
 
@@ -312,7 +312,7 @@ public class MachineFragment extends BaseFragment {
         axisLeft = chart2.getAxisLeft();
         xAxis.setDrawLabels(false);
 
-        xAxis.setTextColor(Color.WHITE);
+        xAxis.setTextColor(inDanger? getResources().getColor(R.color.holo_red) : Color.WHITE);
         xAxis.setDrawAxisLine(false);
         xAxis.setDrawGridLines(false);
 
@@ -323,7 +323,7 @@ public class MachineFragment extends BaseFragment {
         axisLeft.setDrawAxisLine(false);
         axisLeft.setDrawGridLines(true);
         axisLeft.setDrawLabels(true);
-        axisLeft.setTextColor(Color.WHITE);
+        axisLeft.setTextColor(inDanger? getResources().getColor(R.color.holo_red) : Color.WHITE);
 
         axisLeft.setAxisMaximum(100);
         axisLeft.setAxisMinimum(0);
