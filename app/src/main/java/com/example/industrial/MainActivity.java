@@ -7,6 +7,9 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager.widget.ViewPager;
 
 
+import android.app.ActivityManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
@@ -72,7 +75,7 @@ public class MainActivity extends BaseActivity {
                         machines -> {
                             for(int i = 0; i < machines.size(); i++){
                                 Log.i("DEBUG", machines.get(i).getName());
-                                fragments.add(MachineFragment.newInstance(machines.get(i), R.menu.main_menu));
+                                fragments.add(MachineFragment.newInstance(machines.get(i), R.menu.main_menu, null, false));
 
                             }
                             screenSlidePagerAdapter.notifyDataSetChanged();
@@ -88,20 +91,32 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void onResume() {
+        for(MachineFragment fragment: fragments){
+            fragment.resumeData();
+        }
         super.onResume();
         Log.d("MainActivity", "onResume");
     }
 
     @Override
     protected void onPause() {
+        ActivityManager am = (ActivityManager)getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE);
+        ComponentName cn = am.getRunningTasks(1).get(0).topActivity;
+
+        Log.i("OnPause", cn.toString());
+
+        for(MachineFragment fragment: fragments){
+            fragment.stopData();
+        }
+
         super.onPause();
+
 
         Log.d("MainActivity", "onPause");
     }
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
 
         FragmentManager manager = getSupportFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
@@ -112,10 +127,12 @@ public class MainActivity extends BaseActivity {
         transaction.commit();
 
         Log.d("MainActivity", "onDestroy");
+        super.onDestroy();
     }
 
     @Override
     public boolean onGesture(GlassGestureDetector.Gesture gesture) {
+        Log.i(getClass().getName(),"OnGesture");
         switch (gesture) {
             case TAP:
                 fragments.get(viewPager.getCurrentItem()).onSingleTapUp();
