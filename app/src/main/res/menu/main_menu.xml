@@ -6,4 +6,5 @@
   <item android:id="@+id/stop" android:icon="@android:drawable/ic_media_pause" android:title="Stop"/>
 
   <item android:id="@+id/story" android:icon="@android:drawable/list_selector_background" android:title="Log"/>
+  <item android:id="@+id/go_to_danger" android:icon="@android:drawable/list_selector_background" android:title="Go to Danger"/>
 </menu>
