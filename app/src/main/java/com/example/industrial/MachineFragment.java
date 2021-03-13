@@ -86,7 +86,7 @@ public class MachineFragment extends BaseFragment {
      * @return A new instance of fragment MachineFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static MachineFragment newInstance(Serializable machine, int menu) {
+    public static MachineFragment newInstance(Serializable machine, @Nullable int menu, @Nullable Serializable machineData, boolean inDanger) {
         MachineFragment fragment = new MachineFragment();
         Bundle args = new Bundle();
         args.putSerializable(MACHINE, machine);
@@ -176,14 +176,20 @@ public class MachineFragment extends BaseFragment {
                     break;
                 case R.id.pause:
                     updateMachineStatus(Machine.PAUSE);
-                    started = false;
+
                     selectedOption = getString(R.string.pause);
                     break;
                 case R.id.stop:
                     selectedOption = getString(R.string.stop);
                     updateMachineStatus(Machine.STOP);
-                    dangerText.setVisibility(View.VISIBLE);
+                    started = false;
+                    machineData.clear();
+                    chartsUpdate();
+
                     break;
+                case R.id.go_to_danger:
+                    Log.i("MachineFragment","Go to danger");
+                    goToDangerMode();
 
             }
             Toast.makeText(getActivity(), selectedOption + " option selected.", Toast.LENGTH_SHORT)
@@ -197,27 +203,36 @@ public class MachineFragment extends BaseFragment {
         statusView.setText(status);
     }
 
+    private void checkData(MachineData data){
+        boolean danger = false;
+        if(!machine.checkSpeed(data.getSpeed())){
+            Log.i("DANGER", "speed: " + data.getSpeed());
+            danger = true;
+
+        }
+
+        if(!machine.checkEfficiency(data.getEfficiency())){
+            Log.i("DANGER", "efficiency: " + data.getEfficiency());
+            danger = true;
+        }
+
+        if(!machine.checkTemp(data.getTemp())){
+            Log.i("DANGER", "temp: " + data.getTemp());
+            danger = true;
+        }
+
+        if(danger){
+            goToDangerMode();
+        }
+    }
     private void startGetData(){
                 apiService.getMachineDataUpdate(machine.getId())
                 .repeatWhen(completed ->  completed.delay(1000, TimeUnit.MILLISECONDS).takeWhile(v -> started))
                 .subscribe(machineDataUpdate -> {
-                    Log.i("data", Integer.toString(machine.getId()));
-                    if(!machine.checkSpeed(machineDataUpdate.getSpeed())){
-                        Log.i("DANGER", "speed: " + machineDataUpdate.getSpeed());
-//                        goToDangerMode();
+//                    Log.i("data", Integer.toString(machine.getId()));
 
-                    }
-
-                    if(!machine.checkEfficiency(machineDataUpdate.getEfficiency())){
-                        Log.i("DANGER", "efficiency: " + machineDataUpdate.getEfficiency());
-//                        goToDangerMode();
-                    }
-
-                    if(!machine.checkTemp(machineDataUpdate.getTemp())){
-                        Log.i("DANGER", "temp: " + machineDataUpdate.getTemp());
-                        value3.setTextColor(Color.RED);
-                        inDanger = true;
-//                        goToDangerMode();
+                    if(! inDanger){
+                        checkData(machineDataUpdate);
                     }
 
                     if(dataCounter > 10){
@@ -237,19 +252,18 @@ public class MachineFragment extends BaseFragment {
                 });
     }
 
+    public void stopData(){
+        started = false;
+    }
+
+    public void resumeData(){
+        started = true;
+        startGetData();
+    }
+
+
     private void startMachine(){
-        service.controlMachine(machine.getId(), DataService.Control.START, new DataService.VolleyResponseListener() {
-            @Override
-            public void onError(String message) {
 
-            }
-
-            @Override
-            public void onResponse(Object response) {
-                machine.setStatus("RUN");
-                statusView.setText(machine.getStatus());
-            }
-        });
     }
 
     private void chartsUpdate(){
@@ -332,7 +346,9 @@ public class MachineFragment extends BaseFragment {
 
     private void goToDangerMode(){
         Intent intent = new Intent(getActivity(), DangerActivity.class);
-        getActivity().finish();
+        intent.putExtra(DangerActivity.MACHINE_EXTRA, machine);
+//        intent.putExtra(DangerActivity.MACHINE_DATA_EXTRA, machineData);
+//        getActivity().finish();
         startActivity(intent);
     }
 
