@@ -195,6 +195,10 @@ public class MachineFragment extends BaseFragment {
             Toast.makeText(getActivity(), selectedOption + " option selected.", Toast.LENGTH_SHORT)
                     .show();
         }
+
+        if(requestCode == machine.getId() && resultCode == DangerActivity.RESULT_DANGER){
+            inDanger = false;
+        }
     }
 
 
@@ -346,10 +350,11 @@ public class MachineFragment extends BaseFragment {
 
     private void goToDangerMode(){
         Intent intent = new Intent(getActivity(), DangerActivity.class);
-        intent.putExtra(DangerActivity.MACHINE_EXTRA, machine);
-//        intent.putExtra(DangerActivity.MACHINE_DATA_EXTRA, machineData);
-//        getActivity().finish();
-        startActivity(intent);
+
+        intent.putExtra(DangerActivity.MACHINE_DATA_EXTRA, machineData);
+        intent.putExtra(DangerActivity.MACHINE_EXTRA, (Serializable) machine);
+
+        startActivityForResult(intent, getMachineId());
     }
 
 }
