@@ -37,9 +37,12 @@ import androidx.recyclerview.widget.SnapHelper;
 import com.example.industrial.BaseActivity;
 import com.example.industrial.R;
 import com.example.industrial.glass.GlassGestureDetector;
+import com.example.industrial.models.Machine;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import info.androidhive.fontawesome.FontDrawable;
 
 /**
  * Activity which provides the menu functionality. It creates the horizontal recycler view to move
@@ -47,21 +50,15 @@ import java.util.List;
  */
 public class MenuActivity extends BaseActivity implements GlassGestureDetector.OnGestureListener {
 
-  /**
-   * Key for the menu item id.
-   */
+  public static final int RESULT_MENU = 1000;
+
   public static final String EXTRA_MENU_ITEM_ID_KEY = "id";
 
-  /**
-   * Default value for the menu item.
-   */
   public static final int EXTRA_MENU_ITEM_DEFAULT_VALUE = -1;
 
-  /**
-   * Key for the menu.
-   */
   public static final String EXTRA_MENU_KEY = "menu_key";
   public static final String EXTRA_MACHINE_KEY = "machine";
+  public static final String EXTRA_MACHINE_STATUS_KEY = "machine status";
 
   private MenuAdapter adapter;
   private List<GlassMenuItem> menuItems = new ArrayList<>();
@@ -105,7 +102,8 @@ public class MenuActivity extends BaseActivity implements GlassGestureDetector.O
     int menuResource = getIntent()
         .getIntExtra(EXTRA_MENU_KEY, EXTRA_MENU_ITEM_DEFAULT_VALUE);
 
-    Log.d("MenuActivity","creating options menu");
+    String machineStatus = getIntent().getStringExtra(EXTRA_MACHINE_STATUS_KEY);
+
     if (menuResource != EXTRA_MENU_ITEM_DEFAULT_VALUE) {
       final MenuInflater inflater = getMenuInflater();
       inflater.inflate(menuResource, menu);
@@ -167,7 +165,7 @@ public class MenuActivity extends BaseActivity implements GlassGestureDetector.O
         final Intent intent = new Intent();
         intent.putExtra(EXTRA_MENU_ITEM_ID_KEY, menuItems.get(currentMenuItemIndex).getId());
 
-        setResult(RESULT_OK, intent);
+        setResult(RESULT_MENU, intent);
         finish();
         return true;
       default:
