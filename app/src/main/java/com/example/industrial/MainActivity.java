@@ -1,5 +1,6 @@
 package com.example.industrial;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
@@ -10,11 +11,13 @@ import androidx.viewpager.widget.ViewPager;
 import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 
 import com.example.industrial.glass.GlassGestureDetector;
+import com.example.industrial.menu.MenuActivity;
 import com.example.industrial.models.Machine;
 
 
@@ -91,28 +94,44 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void onResume() {
-        for(MachineFragment fragment: fragments){
-            fragment.resumeData();
-        }
+//        for(MachineFragment fragment: fragments){
+//            if(fragment.getMachineStatus() == Machine.START){
+//                fragment.onResume();
+//            }
+//        }
         super.onResume();
         Log.d("MainActivity", "onResume");
     }
 
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+//        if(resultCode == MenuActivity.RESULT_MENU) {
+//            for (MachineFragment fragment : fragments) {
+//                Log.d(getClass().getName(), "fragment " + fragment.getMachineId());
+//                if (fragment.getMachineStatus() == Machine.START && requestCode != fragment.getMachineId()) {
+//                    fragment.resumeData();
+//                }
+//            }
+//        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+
+
     @Override
     protected void onPause() {
+
         ActivityManager am = (ActivityManager)getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE);
         ComponentName cn = am.getRunningTasks(1).get(0).topActivity;
 
         Log.i(getClass().getName(),"onPause" +  cn.toString());
 
-        for(MachineFragment fragment: fragments){
-            fragment.stopData();
-        }
+//        for(MachineFragment fragment: fragments){
+//            fragment.onPause();
+//        }
 
         super.onPause();
-
-
-        Log.d("MainActivity", "onPause");
     }
 
     @Override
@@ -122,7 +141,7 @@ public class MainActivity extends BaseActivity {
         FragmentTransaction transaction = manager.beginTransaction();
         for(int i = 0; i < fragments.size(); i++){
 
-            transaction.remove(fragments.get(i)).commit();
+            transaction.remove(fragments.get(i));
         }
         transaction.commit();
 
