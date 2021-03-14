@@ -146,7 +146,7 @@ public class MachineFragment extends BaseFragment {
     public void onSingleTapUp() {
         if (getArguments() != null) {
             int menu = getArguments().getInt(MENU_KEY, MENU_DEFAULT_VALUE);
-            Log.i("MachineFragment", "TAP - menu id: " + menu);
+            Log.i(getClass().getName(), "TAP - menu id: " + menu);
             if (menu != MENU_DEFAULT_VALUE) {
                 Intent intent = new Intent(getActivity(), MenuActivity.class);
                 intent.putExtra(MENU_KEY, menu);
@@ -159,8 +159,9 @@ public class MachineFragment extends BaseFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.i("BaseFragment", "ActivityResult: " + requestCode + " - " + resultCode);
-        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+        Log.d(getClass().getName() + " " + machine.getId(), "ActivityResult: " + requestCode + " - " + resultCode);
+
+        if (requestCode == machine.getId() && resultCode == MenuActivity.RESULT_MENU && data != null) {
             final int id = data.getIntExtra(MenuActivity.EXTRA_MENU_ITEM_ID_KEY,
                     MenuActivity.EXTRA_MENU_ITEM_DEFAULT_VALUE);
             String selectedOption = "";
@@ -172,7 +173,7 @@ public class MachineFragment extends BaseFragment {
                         started = true;
                         startGetData();
                     }
-                    dangerText.setVisibility(View.GONE);
+
                     break;
                 case R.id.pause:
                     updateMachineStatus(Machine.PAUSE);
@@ -188,7 +189,7 @@ public class MachineFragment extends BaseFragment {
 
                     break;
                 case R.id.go_to_danger:
-                    Log.i("MachineFragment","Go to danger");
+                    Log.i(getClass().getName(),"Go to danger");
                     goToDangerMode();
 
             }

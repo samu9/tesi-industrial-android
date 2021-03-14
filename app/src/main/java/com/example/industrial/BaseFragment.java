@@ -69,7 +69,7 @@ public abstract class BaseFragment extends Fragment implements OnSingleTapUpList
   @Override
   public void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
-    Log.i("BaseFragment", "ActivityResult: " + requestCode + " - " + resultCode);
+    Log.i(getClass().getName(), "ActivityResult: " + requestCode + " - " + resultCode);
     if (requestCode == REQUEST_CODE && resultCode == RESULT_OK && data != null) {
       final int id = data.getIntExtra(MenuActivity.EXTRA_MENU_ITEM_ID_KEY,
           MenuActivity.EXTRA_MENU_ITEM_DEFAULT_VALUE);

@@ -75,7 +75,7 @@ public class MenuActivity extends BaseActivity implements GlassGestureDetector.O
 
     machineId = getIntent().getIntExtra(EXTRA_MACHINE_KEY, -1);
 
-    Log.d("MenuActivity","menu activity on machine id " + machineId);
+    Log.d(getClass().getName(),"menu activity on machine id " + machineId);
     final RecyclerView recyclerView = findViewById(R.id.menuRecyclerView);
     adapter = new MenuAdapter(menuItems);
     final LayoutManager layoutManager = new LinearLayoutManager(this,
@@ -97,7 +97,7 @@ public class MenuActivity extends BaseActivity implements GlassGestureDetector.O
         currentMenuItemIndex = layoutManager.getPosition(foundView);
       }
     });
-    Log.d("MenuActivity", "Created");
+    Log.d(getClass().getName(), "Created");
   }
 
   @Override

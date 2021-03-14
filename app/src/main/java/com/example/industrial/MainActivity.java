@@ -103,7 +103,7 @@ public class MainActivity extends BaseActivity {
         ActivityManager am = (ActivityManager)getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE);
         ComponentName cn = am.getRunningTasks(1).get(0).topActivity;
 
-        Log.i("OnPause", cn.toString());
+        Log.i(getClass().getName(),"onPause" +  cn.toString());
 
         for(MachineFragment fragment: fragments){
             fragment.stopData();
@@ -126,7 +126,7 @@ public class MainActivity extends BaseActivity {
         }
         transaction.commit();
 
-        Log.d("MainActivity", "onDestroy");
+        Log.d(getClass().getName(), "onDestroy");
         super.onDestroy();
     }
 
