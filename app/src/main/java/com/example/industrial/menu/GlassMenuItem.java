@@ -23,6 +23,8 @@ import androidx.annotation.Nullable;
 
 import java.util.Objects;
 
+import info.androidhive.fontawesome.FontDrawable;
+
 /**
  * Represents the single menu item object.
  */
@@ -66,6 +68,8 @@ public class GlassMenuItem {
     return text;
   }
 
+  public void setIcon(Drawable icon) { this.icon = icon; }
+
   @Override
   public int hashCode() {
     return Objects.hash(id, icon, text);
@@ -91,3 +95,5 @@ public class GlassMenuItem {
     return id + " " + icon + " " + text;
   }
 }
+
+

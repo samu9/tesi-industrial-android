@@ -112,10 +112,48 @@ public class MenuActivity extends BaseActivity implements GlassGestureDetector.O
 
       for (int i = 0; i < menu.size(); i++) {
         final MenuItem menuItem = menu.getItem(i);
-        menuItems.add(
-            new GlassMenuItem(menuItem.getItemId(), menuItem.getIcon(),
-                menuItem.getTitle().toString()));
-        Log.d("MenuActivity",menuItem.getTitle().toString());
+        if(!machineStatus.equals(Machine.PAUSE) && menuItem.getItemId() == R.id.resume){
+          continue;
+        }
+        if((machineStatus.equals(Machine.START) || machineStatus.equals(Machine.PAUSE)) && menuItem.getItemId() == R.id.start){
+          continue;
+        }
+        if(machineStatus.equals(Machine.PAUSE) && menuItem.getItemId() == R.id.pause){
+          continue;
+        }
+        if(machineStatus.equals(Machine.STOP) && (menuItem.getItemId() == R.id.stop || menuItem.getItemId() == R.id.pause)){
+          continue;
+        }
+
+        FontDrawable icon;
+        switch (menuItem.getItemId()){
+          case R.id.start:
+            icon = new FontDrawable(this, R.string.fa_play_solid,true,false);
+            break;
+          case R.id.pause:
+            icon =  new FontDrawable(this, R.string.fa_pause_solid,true,false);
+            break;
+          case R.id.stop:
+            icon =  new FontDrawable(this, R.string.fa_stop_solid,true,false);
+            break;
+          case R.id.resume:
+            icon =  new FontDrawable(this, R.string.fa_step_forward_solid,true,false);
+            break;
+          case R.id.story:
+            icon =  new FontDrawable(this, R.string.fa_file_alt,true,false);
+            break;
+//          case R.id.power_off:
+//            icon =  new FontDrawable(this, R.string.fa_power_off_solid,true,false);
+//            break;
+          default:
+            icon = null;
+        }
+
+        GlassMenuItem glassMenuItem = new GlassMenuItem(menuItem.getItemId(), icon,
+                menuItem.getTitle().toString());
+
+        menuItems.add(glassMenuItem);
+        Log.d(getClass().getName(),menuItem.getTitle().toString() + " - " + menuItem.getItemId());
         adapter.notifyDataSetChanged();
       }
     }

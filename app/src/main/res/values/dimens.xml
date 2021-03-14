@@ -17,4 +17,6 @@
     <!-- The recommended menu text margin. -->
     <dimen name="menu_text_margin">16dp</dimen>
 
+    <dimen name="menu_icon_size">24dp</dimen>
+
 </resources>
