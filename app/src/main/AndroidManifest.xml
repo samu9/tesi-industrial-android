@@ -11,6 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".TestActivity2"></activity>
 
         <meta-data
             android:name="com.google.android.glass.TouchEnabledApplication"
@@ -22,29 +23,28 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
 
-                <!--                categoria per mostrare l'applicazione nel menu del Glass-->
-                <category android:name="com.google.android.glass.category.DIRECTORY"/>
-
+                <!-- categoria per mostrare l'applicazione nel menu del Glass -->
+                <category android:name="com.google.android.glass.category.DIRECTORY" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".menu.MenuActivity"
+        <activity
+            android:name=".menu.MenuActivity"
             android:label="MenuActivity"
             android:theme="@style/MenuTheme">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".DangerActivity"
             android:label="@string/title_activity_danger"
-            android:theme="@style/AppTheme"
-            android:noHistory="true">
-        </activity>
+            android:theme="@style/AppTheme">
+<!--            <intent-filter>-->
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+<!--                <category android:name="android.intent.category.DEFAULT" />-->
 
+<!--            </intent-filter>-->
+        </activity>
     </application>
 
 </manifest>
