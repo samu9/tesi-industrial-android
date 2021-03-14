@@ -1,13 +1,11 @@
 package com.example.industrial;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,13 +14,11 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.industrial.adapters.MachineDataAdapter;
 import com.example.industrial.menu.MenuActivity;
 import com.example.industrial.models.Machine;
 import com.example.industrial.models.MachineData;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
@@ -36,8 +32,13 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 import static android.app.Activity.RESULT_OK;
+import static java.lang.Thread.currentThread;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -47,9 +48,15 @@ import static android.app.Activity.RESULT_OK;
 public class MachineFragment extends BaseFragment {
 
     // TODO: Rename parameter arguments, choose names that match
-    private static final String MACHINE = "machine";
+    protected static final String MACHINE = "machine";
+    protected static final String MACHINE_DATA = "machine data";
     protected static final String MENU_KEY = "menu_key";
     protected static final String IN_DANGER_KEY = "in danger";
+
+    private static final int MAX_DATA_BARS = 10;
+    private static final int DATA_UPDATE_DELAY = 2000;
+
+    private static boolean menuOpened = false;
 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 
@@ -71,7 +78,7 @@ public class MachineFragment extends BaseFragment {
 
     int dataCounter = 0;
 
-    boolean started = true;
+    boolean started = false;
     boolean inDanger = false;
 
     public MachineFragment() {
@@ -91,6 +98,7 @@ public class MachineFragment extends BaseFragment {
         Bundle args = new Bundle();
         args.putSerializable(MACHINE, machine);
         args.putInt(MENU_KEY, menu);
+        args.putSerializable(MACHINE_DATA, machineData);
         args.putBoolean(IN_DANGER_KEY, inDanger);
 
         fragment.setArguments(args);
@@ -100,21 +108,23 @@ public class MachineFragment extends BaseFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        apiService = APIClient.getInstance().create(APIInterface.class);
+
         if (getArguments() != null) {
             machine = (Machine) getArguments().getSerializable(MACHINE);
             inDanger = getArguments().getBoolean(IN_DANGER_KEY);
         }
 
-        machineData = new ArrayList<>();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_machine, container, false);
 
-        apiService = APIClient.getInstance().create(APIInterface.class);
+        View headerSeparator = v.findViewById(R.id.header_separator);
+        headerSeparator.setBackgroundColor(inDanger? getResources().getColor(R.color.holo_red) : Color.WHITE);
 
         nameView = v.findViewById(R.id.machine_name);
         idView = v.findViewById(R.id.machine_id);
@@ -136,7 +146,20 @@ public class MachineFragment extends BaseFragment {
             dangerText.setVisibility(View.VISIBLE);
         }
 
-        startGetData();
+        machineData = new ArrayList<>();
+        ArrayList<MachineData> extraMachineData = (ArrayList<MachineData>) getArguments().getSerializable(MACHINE_DATA);
+        if(extraMachineData != null){
+            Log.i(getClass().getName(), "extraMachineData");
+            for(MachineData data: extraMachineData){
+                addData(data);
+            }
+        }
+
+        if(getMachineStatus().equals(Machine.START)){
+            Log.i(getClass().getName(),"machine " + machine.getId() + " status: " + Machine.START + " - starting");
+            started = true;
+            startGetData();
+        }
 
         return v;
     }
@@ -148,12 +171,31 @@ public class MachineFragment extends BaseFragment {
             int menu = getArguments().getInt(MENU_KEY, MENU_DEFAULT_VALUE);
             Log.i(getClass().getName(), "TAP - menu id: " + menu);
             if (menu != MENU_DEFAULT_VALUE) {
+                menuOpened = true;
                 Intent intent = new Intent(getActivity(), MenuActivity.class);
                 intent.putExtra(MENU_KEY, menu);
                 intent.putExtra(MACHINE, machine.getId());
-                startActivityForResult(intent, REQUEST_CODE);
+                intent.putExtra(MenuActivity.EXTRA_MACHINE_STATUS_KEY, getMachineStatus());
+                startActivityForResult(intent, machine.getId());
             }
         }
+    }
+
+    @Override
+    public void onPause() {
+        if(!menuOpened && inDanger){
+            pauseData();
+        }
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        Log.d(getClass().getName() + " " + getMachineId(), "onResume");
+        if(!menuOpened && machine.getStatus() == Machine.START && !started){
+            resumeData();
+        }
+        super.onResume();
     }
 
     @Override
@@ -164,11 +206,15 @@ public class MachineFragment extends BaseFragment {
         if (requestCode == machine.getId() && resultCode == MenuActivity.RESULT_MENU && data != null) {
             final int id = data.getIntExtra(MenuActivity.EXTRA_MENU_ITEM_ID_KEY,
                     MenuActivity.EXTRA_MENU_ITEM_DEFAULT_VALUE);
-            String selectedOption = "";
+
+            menuOpened = false;
+            String message = null;
+
             switch (id) {
                 case R.id.start:
-                    selectedOption = getString(R.string.start);
+                    message = "Starting " + machine.getName();
                     updateMachineStatus(Machine.START);
+
                     if(!started){
                         started = true;
                         startGetData();
@@ -176,25 +222,34 @@ public class MachineFragment extends BaseFragment {
 
                     break;
                 case R.id.pause:
+                    message = "Pausing " + machine.getName();
                     updateMachineStatus(Machine.PAUSE);
+                    pauseData();
 
-                    selectedOption = getString(R.string.pause);
+                    break;
+                case R.id.resume:
+                    message = "Resuming " + machine.getName();
+                    updateMachineStatus(Machine.START);
+                    resumeData();
+
                     break;
                 case R.id.stop:
-                    selectedOption = getString(R.string.stop);
+                    message = "Stopping " + machine.getName();
                     updateMachineStatus(Machine.STOP);
-                    started = false;
-                    machineData.clear();
-                    chartsUpdate();
+                    stopData();
 
                     break;
                 case R.id.go_to_danger:
                     Log.i(getClass().getName(),"Go to danger");
                     goToDangerMode();
 
+                case R.id.halt:
+                    resolveDanger();
+
             }
-            Toast.makeText(getActivity(), selectedOption + " option selected.", Toast.LENGTH_SHORT)
-                    .show();
+            if(message != null){
+                Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
+            }
         }
 
         if(requestCode == machine.getId() && resultCode == DangerActivity.RESULT_DANGER){
@@ -202,6 +257,11 @@ public class MachineFragment extends BaseFragment {
         }
     }
 
+    public String getMachineStatus(){
+        return machine.getStatus();
+    }
+
+    public int getMachineId() { return machine.getId(); }
 
     private void updateMachineStatus(String status){
         machine.setStatus(status);
@@ -230,35 +290,61 @@ public class MachineFragment extends BaseFragment {
             goToDangerMode();
         }
     }
-    private void startGetData(){
-                apiService.getMachineDataUpdate(machine.getId())
-                .repeatWhen(completed ->  completed.delay(1000, TimeUnit.MILLISECONDS).takeWhile(v -> started))
-                .subscribe(machineDataUpdate -> {
-//                    Log.i("data", Integer.toString(machine.getId()));
 
-                    if(! inDanger){
-                        checkData(machineDataUpdate);
-                    }
+    private void addData(MachineData data){
+        if(dataCounter + 1 > MAX_DATA_BARS){
+            entries1.remove(0);
+            entries2.remove(0);
+            machineData.remove(0);
+        }
 
-                    if(dataCounter > 10){
-                        entries1.remove(0);
-                        entries2.remove(0);
-                        machineData.remove(0);
-                    }
+        entries1.add(new BarEntry(dataCounter, data.getValues()[0]));
+        entries2.add(new Entry(dataCounter, data.getValues()[1]));
+        machineData.add(data);
 
-                    entries1.add(new BarEntry(dataCounter, machineDataUpdate.getValues()[0]));
-                    entries2.add(new Entry(dataCounter, machineDataUpdate.getValues()[1]));
-                    machineData.add(machineDataUpdate);
+        dataCounter++;
+        chartsUpdate();
 
-                    dataCounter++;
-                    chartsUpdate();
-
-                    value3.setText(Integer.toString(machineDataUpdate.getValues()[2]));
-                });
+        value3.setText(Integer.toString(data.getValues()[2]));
     }
 
+    private void startGetData(){
+        Log.d(getClass().getName(),"startGetData()" + " thread:" + currentThread().getId());
+        dataCounter = machineData.size();
+
+        AtomicInteger counter = new AtomicInteger();
+        apiService.getMachineDataUpdate(machine.getId())
+                .repeatWhen(completed ->  completed.delay(DATA_UPDATE_DELAY, TimeUnit.MILLISECONDS)
+                        .takeWhile(v -> started))
+                .observeOn(Schedulers.io())
+                .subscribeOn(Schedulers.newThread())
+                .subscribe(machineDataUpdate -> {
+                            counter.getAndIncrement();
+                            Log.d(counter.toString() + " thread:" + currentThread().getId() + " data", Integer.toString(machine.getId()));
+
+                            if(!inDanger){
+                                checkData(machineDataUpdate);
+                            }
+
+                            addData(machineDataUpdate);
+                        },
+                        Throwable::printStackTrace);
+    }
+
+    public void pauseData() { started = false;}
+
     public void stopData(){
-        started = false;
+        pauseData();
+
+        machineData.clear();
+        entries1.clear();
+        entries2.clear();
+
+        value3.setText("N.D.");
+
+        dataCounter = 0;
+
+        chartsUpdate();
     }
 
     public void resumeData(){
@@ -266,10 +352,6 @@ public class MachineFragment extends BaseFragment {
         startGetData();
     }
 
-
-    private void startMachine(){
-
-    }
 
     private void chartsUpdate(){
         BarDataSet dataSet1 = new BarDataSet(entries1, "data");
@@ -350,12 +432,19 @@ public class MachineFragment extends BaseFragment {
     }
 
     private void goToDangerMode(){
+        inDanger = true;
         Intent intent = new Intent(getActivity(), DangerActivity.class);
 
         intent.putExtra(DangerActivity.MACHINE_DATA_EXTRA, machineData);
         intent.putExtra(DangerActivity.MACHINE_EXTRA, (Serializable) machine);
 
         startActivityForResult(intent, getMachineId());
+    }
+
+    public void resolveDanger(){
+        Intent intent = new Intent();
+        getActivity().setResult(DangerActivity.RESULT_DANGER, intent);
+        getActivity().finish();
     }
 
 }
