@@ -36,17 +36,29 @@ public class MachineData implements Parcelable {
         return values;
     }
 
+    public int getValue(MachineValue value){
+        switch(value){
+            case Efficiency:
+                return getEfficiency();
+            case RPM:
+                return getSpeed();
+            case Temp:
+                return getTemp();
+            default:
+                return 0;
+        }
+    }
 
     public int getSpeed(){
-        return values[0];
+        return values[MachineValue.RPM.ordinal()];
     }
 
     public int getEfficiency(){
-        return values[1];
+        return values[MachineValue.Efficiency.ordinal()];
     }
 
     public int getTemp(){
-        return values[2];
+        return values[MachineValue.Temp.ordinal()];
     }
 
     public String getTimestamp() {
