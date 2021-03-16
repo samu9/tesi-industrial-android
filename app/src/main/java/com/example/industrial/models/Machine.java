@@ -1,5 +1,9 @@
 package com.example.industrial.models;
 
+import android.util.Log;
+
+import androidx.annotation.Nullable;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
@@ -7,14 +11,17 @@ import java.io.Serializable;
 public class Machine implements Serializable {
 
     // Machine status constants
-    public static String START = "START";
-    public static String PAUSE = "PAUSE";
-    public static String STOP = "STOP";
-    public static String HALT = "HALT";
+    public final static String START = "START";
+    public final static String PAUSE = "PAUSE";
+    public final static String STOP = "STOP";
+    public final static String HALT = "HALT";
 
     private String name;
     private int id;
     private int sectorId;
+
+    @SerializedName("value_in_danger")
+    private MachineValue valueInDanger;
     private String status;
 
     @SerializedName("temp_threshold")
@@ -26,7 +33,7 @@ public class Machine implements Serializable {
     @SerializedName("efficiency_threshold")
     private int efficiencyThreshold;
 
-    public Machine(String name, int id, int sectorId, String status, int tempThreshold, int speedThreshold, int efficiencyThreshold) {
+    public Machine(String name, int id, int sectorId, String status, int tempThreshold, int speedThreshold, int efficiencyThreshold, @Nullable MachineValue valueInDanger) {
         this.name = name;
         this.id = id;
         this.sectorId = sectorId;
@@ -34,6 +41,7 @@ public class Machine implements Serializable {
         this.tempThreshold = tempThreshold;
         this.speedThreshold = speedThreshold;
         this.efficiencyThreshold = efficiencyThreshold;
+        this.valueInDanger = valueInDanger;
     }
 
 
@@ -53,19 +61,48 @@ public class Machine implements Serializable {
         return sectorId;
     }
 
+    public MachineValue getValueInDanger() {
+        return valueInDanger;
+    }
+
+    public void setValueInDanger(MachineValue valueInDanger) {
+        this.valueInDanger = valueInDanger;
+    }
+
     public void setStatus(String status) {
         this.status = status;
     }
 
+    public boolean checkData(MachineData data){
+        return this.checkTemp(data.getTemp()) &&
+                this.checkEfficiency(data.getEfficiency()) &&
+                this.checkSpeed(data.getSpeed());
+    }
+
     public boolean checkTemp(int temp){
-        return (temp <= tempThreshold);
+        boolean pass = temp <= tempThreshold;
+        if(!pass){
+            Log.d(getClass().getName() + " " + getId(),"temp in danger: " + temp + "/" + tempThreshold);
+            this.setValueInDanger(MachineValue.Temp);
+        }
+        return pass;
     }
 
     public boolean checkEfficiency(int efficiency){
-        return (efficiency >= efficiencyThreshold);
+        boolean pass = efficiency >= efficiencyThreshold;
+        if(!pass){
+            Log.d(getClass().getName() + " " + getId(),"efficiency in danger: " + efficiency);
+            this.setValueInDanger(MachineValue.Efficiency);
+        }
+        return pass;
     }
 
     public boolean checkSpeed(int speed){
-        return (speed <= speedThreshold);
+        boolean pass = speed <= speedThreshold;
+        if(!pass){
+            Log.d(getClass().getName() + " " + getId(),"speed in danger");
+            this.setValueInDanger(MachineValue.RPM);
+        }
+        return pass;
     }
 }
