@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.example.industrial.menu.MenuActivity;
 import com.example.industrial.models.Machine;
 import com.example.industrial.models.MachineData;
+import com.example.industrial.models.MachineValue;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -34,10 +35,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
-import static android.app.Activity.RESULT_OK;
 import static java.lang.Thread.currentThread;
 
 /**
@@ -58,22 +57,20 @@ public class MachineFragment extends BaseFragment {
 
     private static boolean menuOpened = false;
 
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-
-    // TODO: Rename and change types of parameters
+ 
     private Machine machine;
 
     ArrayList<MachineData> machineData;
 
-    TextView statusView, idView, nameView, value3, dangerText;
+    TextView statusView, idView, nameView, tempValue, dangerText;
 
-    LineChart chart2;
-    BarChart chart1;
+    LineChart efficiencyChart;
+    BarChart rpmChart;
 
     APIInterface apiService;
 
-    List<BarEntry> entries1 = new ArrayList<>();
-    List<Entry> entries2 = new ArrayList<>();
+    List<BarEntry> rpmEntries = new ArrayList<>();
+    List<Entry> efficiencyEntries = new ArrayList<>();
 
 
     int dataCounter = 0;
@@ -124,24 +121,23 @@ public class MachineFragment extends BaseFragment {
         View v = inflater.inflate(R.layout.fragment_machine, container, false);
 
         View headerSeparator = v.findViewById(R.id.header_separator);
-        headerSeparator.setBackgroundColor(inDanger? getResources().getColor(R.color.holo_red) : Color.WHITE);
+//        headerSeparator.setBackgroundColor(inDanger? getResources().getColor(R.color.holo_red) : Color.WHITE);
 
         nameView = v.findViewById(R.id.machine_name);
         idView = v.findViewById(R.id.machine_id);
         statusView = v.findViewById(R.id.machine_status);
 
-        chart1 = v.findViewById(R.id.value1_chart);
-        chart2 = v.findViewById(R.id.value2_chart);
+        rpmChart = v.findViewById(R.id.value1_chart);
+        efficiencyChart = v.findViewById(R.id.value2_chart);
+        tempValue = v.findViewById(R.id.value3_number);
+
         chartsSetUp();
-
-        value3 = v.findViewById(R.id.value3_number);
-
-        dangerText = v.findViewById(R.id.danger_text);
 
         nameView.setText(machine.getName());
         idView.setText(Integer.toString(machine.getId()));
         statusView.setText(machine.getStatus());
 
+        dangerText = v.findViewById(R.id.danger_text);
         if(inDanger){
             dangerText.setVisibility(View.VISIBLE);
         }
@@ -214,12 +210,7 @@ public class MachineFragment extends BaseFragment {
                 case R.id.start:
                     message = "Starting " + machine.getName();
                     updateMachineStatus(Machine.START);
-
-                    if(!started){
-                        started = true;
-                        startGetData();
-                    }
-
+                    sendMachineCommand(Machine.START);
                     break;
                 case R.id.pause:
                     message = "Pausing " + machine.getName();
@@ -236,16 +227,17 @@ public class MachineFragment extends BaseFragment {
                 case R.id.stop:
                     message = "Stopping " + machine.getName();
                     updateMachineStatus(Machine.STOP);
-                    stopData();
+                    sendMachineCommand(Machine.STOP);
 
                     break;
                 case R.id.go_to_danger:
                     Log.i(getClass().getName(),"Go to danger");
-                    goToDangerMode();
-
+//                    goToDangerMode();
+                    sendDangerMode();
+                    break;
                 case R.id.halt:
                     resolveDanger();
-
+                    break;
             }
             if(message != null){
                 Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
@@ -255,6 +247,33 @@ public class MachineFragment extends BaseFragment {
         if(requestCode == machine.getId() && resultCode == DangerActivity.RESULT_DANGER){
             inDanger = false;
         }
+    }
+
+    private void sendMachineCommand(String command){
+        apiService.commandMachine(machine.getId(), command)
+                .subscribe(apiResult -> {
+                    if(apiResult.getResult()){
+                        switch (command) {
+                            case Machine.START:
+                                if (!started) {
+                                    started = true;
+                                    startGetData();
+                                }
+                                break;
+                            case Machine.PAUSE:
+                                pauseData();
+                                break;
+                            case Machine.STOP:
+                                stopData();
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    Log.i(getClass().getName(), "sendMachineCommand [" + command + "]: " + apiResult.getResult());
+                }, throwable -> {
+                    Log.e(getClass().getName(),Log.getStackTraceString(throwable));
+                });
     }
 
     public String getMachineStatus(){
@@ -293,19 +312,20 @@ public class MachineFragment extends BaseFragment {
 
     private void addData(MachineData data){
         if(dataCounter + 1 > MAX_DATA_BARS){
-            entries1.remove(0);
-            entries2.remove(0);
+            rpmEntries.remove(0);
+            efficiencyEntries.remove(0);
             machineData.remove(0);
         }
 
-        entries1.add(new BarEntry(dataCounter, data.getValues()[0]));
-        entries2.add(new Entry(dataCounter, data.getValues()[1]));
+        rpmEntries.add(new BarEntry(dataCounter, data.getValues()[0]));
+        efficiencyEntries.add(new Entry(dataCounter, data.getValues()[1]));
         machineData.add(data);
+
+        tempValue.setText(Integer.toString(data.getValues()[2]));
 
         dataCounter++;
         chartsUpdate();
 
-        value3.setText(Integer.toString(data.getValues()[2]));
     }
 
     private void startGetData(){
@@ -322,10 +342,11 @@ public class MachineFragment extends BaseFragment {
                             counter.getAndIncrement();
                             Log.d(counter.toString() + " thread:" + currentThread().getId() + " data", Integer.toString(machine.getId()));
 
-                            if(!inDanger){
-                                checkData(machineDataUpdate);
+                            boolean dataCheck = machine.checkData(machineDataUpdate);
+                            if(!dataCheck && !inDanger){
+                                Log.i(getClass().getName() + " " + machine.getId(), "data check failed");
+                                goToDangerMode();
                             }
-
                             addData(machineDataUpdate);
                         },
                         Throwable::printStackTrace);
@@ -337,10 +358,10 @@ public class MachineFragment extends BaseFragment {
         pauseData();
 
         machineData.clear();
-        entries1.clear();
-        entries2.clear();
+        rpmEntries.clear();
+        efficiencyEntries.clear();
 
-        value3.setText("N.D.");
+        tempValue.setText("N.D.");
 
         dataCounter = 0;
 
@@ -354,81 +375,98 @@ public class MachineFragment extends BaseFragment {
 
 
     private void chartsUpdate(){
-        BarDataSet dataSet1 = new BarDataSet(entries1, "data");
-        dataSet1.setColor(inDanger? getResources().getColor(R.color.holo_red) : Color.WHITE);
-        dataSet1.setDrawValues(false);
 
-        BarData barData1 = new BarData(dataSet1);
+        BarDataSet rpmDataSet = new BarDataSet(rpmEntries, "data");
+        rpmDataSet.setColor(machine.getValueInDanger() == MachineValue.RPM && inDanger?
+                getResources().getColor(R.color.holo_red) : Color.WHITE);
+        rpmDataSet.setDrawValues(false);
 
-        LineDataSet dataSet2 = new LineDataSet(entries2, "data");
-        dataSet2.setColor(inDanger? getResources().getColor(R.color.holo_red) : Color.WHITE);
-        dataSet2.setDrawCircles(false);
-        dataSet2.setDrawValues(false);
+        BarData rpmBarData = new BarData(rpmDataSet);
 
-        LineData lineData2 = new LineData(dataSet2);
+        rpmChart.getAxisLeft().setTextColor(machine.getValueInDanger() == MachineValue.RPM && inDanger?
+                getResources().getColor(R.color.holo_red) : Color.WHITE);
 
-        chart1.setData(barData1);
-        chart1.invalidate();
+        LineDataSet efficiencyDataSet = new LineDataSet(efficiencyEntries, "data");
+        efficiencyDataSet.setColor(machine.getValueInDanger() == MachineValue.Efficiency && inDanger?
+                getResources().getColor(R.color.holo_red) : Color.WHITE);
+        efficiencyDataSet.setDrawCircles(false);
+        efficiencyDataSet.setDrawValues(false);
+        efficiencyDataSet.setColor(getResources().getColor(R.color.holo_red));
 
-        chart2.setData(lineData2);
-        chart2.invalidate();
+        LineData efficiencyLineData = new LineData(efficiencyDataSet);
+
+        efficiencyChart.getAxisLeft().setTextColor(machine.getValueInDanger() == MachineValue.Efficiency && inDanger?
+                getResources().getColor(R.color.holo_red) : Color.WHITE);
+
+        rpmChart.setData(rpmBarData);
+        rpmChart.invalidate();
+
+        efficiencyChart.setData(efficiencyLineData);
+        efficiencyChart.invalidate();
+
+        tempValue.setTextColor(machine.getValueInDanger() == MachineValue.Temp && inDanger?
+                getResources().getColor(R.color.holo_red) : Color.WHITE);
+
     }
 
     private void chartsSetUp(){
-        XAxis xAxis;
-        YAxis axisRight, axisLeft;
 
         // chart 1 - BAR CHART
-        chart1.setTouchEnabled(false);
-        chart1.setDrawBorders(false);
-        chart1.setDrawMarkers(false);
-        chart1.setDescription(null);
+        rpmChart.setTouchEnabled(false);
+        rpmChart.setDrawBorders(false);
+        rpmChart.setDrawMarkers(false);
+        rpmChart.setDescription(null);
 
-        xAxis = chart1.getXAxis();
-        axisRight = chart1.getAxisRight();
-        axisLeft = chart1.getAxisLeft();
-        xAxis.setDrawLabels(false);
-        xAxis.setTextColor(inDanger? getResources().getColor(R.color.holo_red) : Color.WHITE);
-        xAxis.setDrawAxisLine(false);
-        xAxis.setDrawGridLines(false);
+        rpmChart.getXAxis().setDrawLabels(false);
+        rpmChart.getXAxis().setTextColor(machine.getValueInDanger() == MachineValue.RPM && inDanger?
+                getResources().getColor(R.color.holo_red) : Color.WHITE);
+        rpmChart.getXAxis().setDrawAxisLine(false);
+        rpmChart.getXAxis().setDrawGridLines(false);
 
-        axisRight.setDrawAxisLine(false);
-        axisRight.setDrawGridLines(false);
-        axisLeft.setDrawAxisLine(false);
-        axisLeft.setDrawGridLines(true);
-        axisLeft.setDrawLabels(true);
-        axisLeft.setTextColor(inDanger? getResources().getColor(R.color.holo_red) : Color.WHITE);
-        axisLeft.setAxisMaximum(5000);
-        axisLeft.setAxisMinimum(0);
+        rpmChart.getAxisRight().setDrawAxisLine(false);
+        rpmChart.getAxisRight().setDrawGridLines(false);
+        rpmChart.getAxisLeft().setDrawAxisLine(false);
+        rpmChart.getAxisLeft().setDrawGridLines(true);
+        rpmChart.getAxisLeft().setDrawLabels(true);
+        rpmChart.getAxisLeft().setTextColor(machine.getValueInDanger() == MachineValue.RPM && inDanger?
+                getResources().getColor(R.color.holo_red) : Color.WHITE);
+        rpmChart.getAxisLeft().setAxisMaximum(5000);
+        rpmChart.getAxisLeft().setAxisMinimum(0);
 
 
         // chart 2 - LINE CHART
-        chart2.setTouchEnabled(false);
-        chart2.setDrawBorders(false);
-        chart2.setDrawMarkers(false);
-        chart2.setDescription(null);
+        efficiencyChart.setTouchEnabled(false);
+        efficiencyChart.setDrawBorders(false);
+        efficiencyChart.setDrawMarkers(false);
+        efficiencyChart.setDescription(null);
 
-        xAxis = chart2.getXAxis();
-        axisRight = chart2.getAxisRight();
-        axisLeft = chart2.getAxisLeft();
-        xAxis.setDrawLabels(false);
+        efficiencyChart.getXAxis().setDrawLabels(false);
 
-        xAxis.setTextColor(inDanger? getResources().getColor(R.color.holo_red) : Color.WHITE);
-        xAxis.setDrawAxisLine(false);
-        xAxis.setDrawGridLines(false);
+        efficiencyChart.getXAxis().setTextColor(machine.getValueInDanger() == MachineValue.Efficiency && inDanger?
+                getResources().getColor(R.color.holo_red) : Color.WHITE);
+        efficiencyChart.getXAxis().setDrawAxisLine(false);
+        efficiencyChart.getXAxis().setDrawGridLines(false);
 
+        efficiencyChart.getAxisRight().setDrawLabels(true);
+        efficiencyChart.getAxisRight().setDrawAxisLine(false);
+        efficiencyChart.getAxisRight().setDrawGridLines(false);
+        efficiencyChart.getAxisLeft().setDrawAxisLine(false);
+        efficiencyChart.getAxisLeft().setDrawGridLines(true);
+        efficiencyChart.getAxisLeft().setDrawLabels(true);
+        efficiencyChart.getAxisLeft().setTextColor(machine.getValueInDanger() == MachineValue.RPM && inDanger?
+                getResources().getColor(R.color.holo_red) : Color.WHITE);
 
-        axisRight.setDrawLabels(true);
-        axisRight.setDrawAxisLine(false);
-        axisRight.setDrawGridLines(false);
-        axisLeft.setDrawAxisLine(false);
-        axisLeft.setDrawGridLines(true);
-        axisLeft.setDrawLabels(true);
-        axisLeft.setTextColor(inDanger? getResources().getColor(R.color.holo_red) : Color.WHITE);
+        efficiencyChart.getAxisLeft().setAxisMaximum(100);
+        efficiencyChart.getAxisLeft().setAxisMinimum(0);
 
-        axisLeft.setAxisMaximum(100);
-        axisLeft.setAxisMinimum(0);
+        tempValue.setTextColor(machine.getValueInDanger() == MachineValue.Temp && inDanger?
+                getResources().getColor(R.color.holo_red) : Color.WHITE);
 
+    }
+
+    private void sendDangerMode(){
+        apiService.commandMachine(machine.getId(), "danger")
+        .subscribe(apiResult -> Log.i(getClass().getName(), "sendDangerMode: " + apiResult.getResult()));
     }
 
     private void goToDangerMode(){
