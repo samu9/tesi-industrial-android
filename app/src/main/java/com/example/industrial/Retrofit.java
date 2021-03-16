@@ -57,6 +57,6 @@ interface APIInterface {
     Observable<MachineData> getMachineDataUpdate(@Path("id") int id);
 
     @POST("machine/{id}/{command}")
-    void commandMachine(@Path("id") int id, @Path("command") String command);
+    Observable<APIResult> commandMachine(@Path("id") int id, @Path("command") String command);
 
 }
