@@ -2,6 +2,7 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
   <item android:id="@+id/halt" android:title="HALT"/>
+  <item android:id="@+id/resolve" android:title="Resolve"></item>
   <item android:id="@+id/start" android:title="Start"/>
   <item android:id="@+id/pause" android:title="Pause"/>
 </menu>

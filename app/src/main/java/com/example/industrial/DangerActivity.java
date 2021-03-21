@@ -39,7 +39,7 @@ public class DangerActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_danger);
-        setTheme(R.style.DangerTheme);
+//        setTheme(R.style.DangerTheme);
 
         content = findViewById(R.id.danger_content);
 

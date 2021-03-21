@@ -238,14 +238,29 @@ public class MachineFragment extends BaseFragment {
                 case R.id.halt:
                     resolveDanger();
                     break;
+                case R.id.resolve:
+                    message = "Danger resolved";
+                    sendMachineCommand("resolve");
+                    break;
             }
             if(message != null){
                 Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
             }
         }
 
+        // ritorno da danger mode risolta
         if(requestCode == machine.getId() && resultCode == DangerActivity.RESULT_DANGER){
             inDanger = false;
+            machine.setStatus(Machine.START);
+            clearData();
+
+            ArrayList<MachineData> returnedData = (ArrayList<MachineData>) data.getSerializableExtra(DangerActivity.MACHINE_DATA_EXTRA);
+            if(returnedData != null){
+                for(MachineData returned: returnedData){
+                    addData(returned);
+                }
+            }
+
         }
     }
 
@@ -274,6 +289,7 @@ public class MachineFragment extends BaseFragment {
                 }, throwable -> {
                     Log.e(getClass().getName(),Log.getStackTraceString(throwable));
                 });
+
     }
 
     public String getMachineStatus(){
@@ -346,6 +362,10 @@ public class MachineFragment extends BaseFragment {
                             if(!dataCheck && !inDanger){
                                 Log.i(getClass().getName() + " " + machine.getId(), "data check failed");
                                 goToDangerMode();
+                            }
+                            // danger mode risolta, posso ritornare
+                            if(dataCheck && inDanger){
+                                backToNormalMode();
                             }
                             addData(machineDataUpdate);
                         },
@@ -480,7 +500,18 @@ public class MachineFragment extends BaseFragment {
     }
 
     public void resolveDanger(){
-        Intent intent = new Intent();
+        apiService.commandMachine(getMachineId(), "resolve").subscribe(apiResult -> {
+//            if(apiResult.getResult()){
+//                Intent intent = new Intent();
+//                getActivity().setResult(DangerActivity.RESULT_DANGER, intent);
+//                getActivity().finish();
+//            }
+        });
+    }
+
+    public void backToNormalMode(){
+        final Intent intent = new Intent();
+        intent.putExtra(DangerActivity.MACHINE_DATA_EXTRA, machineData);
         getActivity().setResult(DangerActivity.RESULT_DANGER, intent);
         getActivity().finish();
     }
