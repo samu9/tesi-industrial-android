@@ -1,5 +1,6 @@
 package com.example.industrial;
 
+import com.example.industrial.menu.APIResult;
 import com.example.industrial.models.Area;
 import com.example.industrial.models.Areas;
 import com.example.industrial.models.Location;
