@@ -15,6 +15,7 @@ public class Machine implements Serializable {
     public final static String PAUSE = "PAUSE";
     public final static String STOP = "STOP";
     public final static String HALT = "HALT";
+    public static final String RESUME = "RESUME";
 
     private String name;
     private int id;
