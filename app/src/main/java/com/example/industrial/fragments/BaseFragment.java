@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.example.industrial;
+package com.example.industrial.fragments;
 
 import android.content.Intent;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
+import com.example.industrial.OnSingleTapUpListener;
 import com.example.industrial.menu.MenuActivity;
 
 import static android.app.Activity.RESULT_OK;

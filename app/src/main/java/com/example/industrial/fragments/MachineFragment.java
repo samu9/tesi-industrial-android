@@ -1,4 +1,4 @@
-package com.example.industrial;
+package com.example.industrial.fragments;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -14,14 +14,17 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.industrial.API.APIClient;
+import com.example.industrial.API.APIInterface;
+import com.example.industrial.R;
+import com.example.industrial.activities.DangerActivity;
+import com.example.industrial.activities.MachineLogActivity;
 import com.example.industrial.menu.MenuActivity;
 import com.example.industrial.models.Machine;
 import com.example.industrial.models.MachineData;
 import com.example.industrial.models.MachineValue;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
@@ -236,6 +239,9 @@ public class MachineFragment extends BaseFragment {
                 case R.id.resolve:
                     message = "Danger resolved";
                     sendMachineCommand("resolve");
+                    break;
+                case R.id.log_menu_item:
+                    goToLogs();
                     break;
             }
             if(message != null){
@@ -466,8 +472,14 @@ public class MachineFragment extends BaseFragment {
 
     }
 
+    private void goToLogs(){
+        Intent intent = new Intent(getActivity(), MachineLogActivity.class);
+        intent.putExtra(MachineLogActivity.MACHINE_ID_EXTRA, machine.getId());
+        startActivity(intent);
+    }
+
     private void sendDangerMode(){
-        apiService.commandMachine(machine.getId(), "danger")
+        apiService.setMachineDanger(getMachineId())
         .subscribe(apiResult -> Log.i(getClass().getName(), "sendDangerMode: " + apiResult.getResult()));
     }
 
