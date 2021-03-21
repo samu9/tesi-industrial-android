@@ -7,5 +7,5 @@
   <item android:id="@+id/pause" android:title="Pause"/>
   <item android:id="@+id/resume" android:title="Resume"/>
   <item android:id="@+id/stop" android:title="Stop"/>
-  <item android:id="@+id/story" android:title="Log"/>
+  <item android:id="@+id/log_menu_item" android:title="Log"/>
 </menu>
