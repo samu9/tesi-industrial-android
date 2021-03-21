@@ -209,30 +209,25 @@ public class MachineFragment extends BaseFragment {
             switch (id) {
                 case R.id.start:
                     message = "Starting " + machine.getName();
-                    updateMachineStatus(Machine.START);
                     sendMachineCommand(Machine.START);
                     break;
                 case R.id.pause:
                     message = "Pausing " + machine.getName();
-                    updateMachineStatus(Machine.PAUSE);
-                    pauseData();
+                    sendMachineCommand(Machine.PAUSE);
 
                     break;
                 case R.id.resume:
                     message = "Resuming " + machine.getName();
-                    updateMachineStatus(Machine.START);
-                    resumeData();
+                    sendMachineCommand(Machine.RESUME);
 
                     break;
                 case R.id.stop:
                     message = "Stopping " + machine.getName();
-                    updateMachineStatus(Machine.STOP);
                     sendMachineCommand(Machine.STOP);
 
                     break;
                 case R.id.go_to_danger:
                     Log.i(getClass().getName(),"Go to danger");
-//                    goToDangerMode();
                     sendDangerMode();
                     break;
                 case R.id.halt:
@@ -265,6 +260,9 @@ public class MachineFragment extends BaseFragment {
     }
 
     private void sendMachineCommand(String command){
+        String newStatus = command == Machine.RESUME? Machine.START : command;
+        updateMachineStatus(newStatus);
+
         apiService.commandMachine(machine.getId(), command)
                 .subscribe(apiResult -> {
                     if(apiResult.getResult()){
@@ -277,6 +275,9 @@ public class MachineFragment extends BaseFragment {
                                 break;
                             case Machine.PAUSE:
                                 pauseData();
+                                break;
+                            case Machine.RESUME:
+                                resumeData();
                                 break;
                             case Machine.STOP:
                                 stopData();
@@ -303,29 +304,6 @@ public class MachineFragment extends BaseFragment {
         statusView.setText(status);
     }
 
-    private void checkData(MachineData data){
-        boolean danger = false;
-        if(!machine.checkSpeed(data.getSpeed())){
-            Log.i("DANGER", "speed: " + data.getSpeed());
-            danger = true;
-
-        }
-
-        if(!machine.checkEfficiency(data.getEfficiency())){
-            Log.i("DANGER", "efficiency: " + data.getEfficiency());
-            danger = true;
-        }
-
-        if(!machine.checkTemp(data.getTemp())){
-            Log.i("DANGER", "temp: " + data.getTemp());
-            danger = true;
-        }
-
-        if(danger){
-            goToDangerMode();
-        }
-    }
-
     private void addData(MachineData data){
         if(dataCounter + 1 > MAX_DATA_BARS){
             rpmEntries.remove(0);
@@ -342,6 +320,18 @@ public class MachineFragment extends BaseFragment {
         dataCounter++;
         chartsUpdate();
 
+    }
+
+    private void clearData(){
+        machineData.clear();
+        rpmEntries.clear();
+        efficiencyEntries.clear();
+
+        tempValue.setText("N.D.");
+
+        dataCounter = 0;
+
+        chartsUpdate();
     }
 
     private void startGetData(){
@@ -376,16 +366,7 @@ public class MachineFragment extends BaseFragment {
 
     public void stopData(){
         pauseData();
-
-        machineData.clear();
-        rpmEntries.clear();
-        efficiencyEntries.clear();
-
-        tempValue.setText("N.D.");
-
-        dataCounter = 0;
-
-        chartsUpdate();
+        clearData();
     }
 
     public void resumeData(){
@@ -411,7 +392,8 @@ public class MachineFragment extends BaseFragment {
                 getResources().getColor(R.color.holo_red) : Color.WHITE);
         efficiencyDataSet.setDrawCircles(false);
         efficiencyDataSet.setDrawValues(false);
-        efficiencyDataSet.setColor(getResources().getColor(R.color.holo_red));
+        efficiencyDataSet.setColor(machine.getValueInDanger() == MachineValue.Efficiency && inDanger?
+                getResources().getColor(R.color.holo_red) : Color.WHITE);
 
         LineData efficiencyLineData = new LineData(efficiencyDataSet);
 
@@ -473,7 +455,7 @@ public class MachineFragment extends BaseFragment {
         efficiencyChart.getAxisLeft().setDrawAxisLine(false);
         efficiencyChart.getAxisLeft().setDrawGridLines(true);
         efficiencyChart.getAxisLeft().setDrawLabels(true);
-        efficiencyChart.getAxisLeft().setTextColor(machine.getValueInDanger() == MachineValue.RPM && inDanger?
+        efficiencyChart.getAxisLeft().setTextColor(machine.getValueInDanger() == MachineValue.Efficiency && inDanger?
                 getResources().getColor(R.color.holo_red) : Color.WHITE);
 
         efficiencyChart.getAxisLeft().setAxisMaximum(100);

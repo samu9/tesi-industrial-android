@@ -110,6 +110,9 @@ public class MenuActivity extends BaseActivity implements GlassGestureDetector.O
 
       for (int i = 0; i < menu.size(); i++) {
         final MenuItem menuItem = menu.getItem(i);
+        if(machineStatus.equals(Machine.STOP) && menuItem.getItemId() == R.id.go_to_danger){
+          continue;
+        }
         if(!machineStatus.equals(Machine.PAUSE) && menuItem.getItemId() == R.id.resume){
           continue;
         }
