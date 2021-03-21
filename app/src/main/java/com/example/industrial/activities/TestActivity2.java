@@ -1,8 +1,8 @@
-package com.example.industrial;
-
-import androidx.appcompat.app.AppCompatActivity;
+package com.example.industrial.activities;
 
 import android.os.Bundle;
+
+import com.example.industrial.R;
 
 public class TestActivity2 extends BaseActivity {
 

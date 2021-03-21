@@ -23,7 +23,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -34,7 +33,7 @@ import androidx.recyclerview.widget.RecyclerView.LayoutManager;
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener;
 import androidx.recyclerview.widget.SnapHelper;
 
-import com.example.industrial.BaseActivity;
+import com.example.industrial.activities.BaseActivity;
 import com.example.industrial.R;
 import com.example.industrial.glass.GlassGestureDetector;
 import com.example.industrial.models.Machine;
@@ -140,7 +139,7 @@ public class MenuActivity extends BaseActivity implements GlassGestureDetector.O
           case R.id.resume:
             icon =  new FontDrawable(this, R.string.fa_step_forward_solid,true,false);
             break;
-          case R.id.story:
+          case R.id.log_menu_item:
             icon =  new FontDrawable(this, R.string.fa_file_alt,true,false);
             break;
 //          case R.id.power_off:

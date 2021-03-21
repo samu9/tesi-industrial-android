@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.industrial;
+package com.example.industrial.activities;
 
 import android.os.Bundle;
 import android.view.MotionEvent;

@@ -1,4 +1,4 @@
-package com.example.industrial;
+package com.example.industrial.activities;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -16,8 +16,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 
+import com.example.industrial.API.APIClient;
+import com.example.industrial.API.APIInterface;
+import com.example.industrial.fragments.MachineFragment;
+import com.example.industrial.R;
 import com.example.industrial.glass.GlassGestureDetector;
-import com.example.industrial.menu.MenuActivity;
 import com.example.industrial.models.Machine;
 
 

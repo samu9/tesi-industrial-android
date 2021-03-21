@@ -1,22 +1,14 @@
-package com.example.industrial;
+package com.example.industrial.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
 
+import com.example.industrial.fragments.MachineFragment;
+import com.example.industrial.R;
 import com.example.industrial.glass.GlassGestureDetector;
-import com.example.industrial.menu.MenuActivity;
 import com.example.industrial.models.Machine;
 import com.example.industrial.models.MachineData;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentTransaction;
 
 import android.util.Log;
-import android.view.View;
 import android.widget.FrameLayout;
 
 import java.util.ArrayList;
