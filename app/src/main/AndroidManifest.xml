@@ -11,13 +11,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".TestActivity2"></activity>
+        <activity android:name=".activities.MachineLogActivity"></activity>
+        <activity android:name=".activities.TestActivity2" />
 
         <meta-data
             android:name="com.google.android.glass.TouchEnabledApplication"
             android:value="true" />
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -36,12 +37,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".DangerActivity"
+            android:name=".activities.DangerActivity"
             android:label="@string/title_activity_danger"
             android:theme="@style/AppTheme">
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
-<!--                <category android:name="android.intent.category.DEFAULT" />-->
+                <!-- <category android:name="android.intent.category.DEFAULT" /> -->
 
             </intent-filter>
         </activity>
