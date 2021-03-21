@@ -39,11 +39,11 @@
             android:name=".DangerActivity"
             android:label="@string/title_activity_danger"
             android:theme="@style/AppTheme">
-<!--            <intent-filter>-->
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+            <intent-filter>
+                <category android:name="android.intent.category.LAUNCHER" />
 <!--                <category android:name="android.intent.category.DEFAULT" />-->
 
-<!--            </intent-filter>-->
+            </intent-filter>
         </activity>
     </application>
 
