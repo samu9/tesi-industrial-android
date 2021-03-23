@@ -10,6 +10,7 @@ import com.example.industrial.API.APIClient;
 import com.example.industrial.API.APIInterface;
 import com.example.industrial.R;
 import com.example.industrial.adapters.MachineLogAdapter;
+import com.example.industrial.glass.GlassGestureDetector;
 import com.example.industrial.models.MachineLog;
 
 import java.util.ArrayList;
@@ -61,5 +62,17 @@ public class MachineLogActivity extends BaseActivity {
 
         });
 
+    }
+
+    @Override
+    public boolean onGesture(GlassGestureDetector.Gesture gesture) {
+        switch (gesture) {
+            case SWIPE_BACKWARD:
+                finish();
+                return true;
+            default:
+                return false;
+
+        }
     }
 }
