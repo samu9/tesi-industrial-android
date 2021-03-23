@@ -68,7 +68,7 @@ public class DangerActivity extends BaseActivity {
                 fragment.onSingleTapUp();
                 return true;
             default:
-                return super.onGesture(gesture);
+                return false;
         }
     }
 }
