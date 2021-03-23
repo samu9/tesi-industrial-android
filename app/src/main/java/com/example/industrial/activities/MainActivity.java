@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.industrial.API.APIClient;
 import com.example.industrial.API.APIInterface;
@@ -89,7 +90,11 @@ public class MainActivity extends BaseActivity {
                             // per mantenere tutti i fragment attivi nel viewpager
                             viewPager.setOffscreenPageLimit(fragments.size());
                         },
-                        error -> Log.e("MyTag", "Throwable " + error.getMessage())
+                        error -> {
+                            Toast.makeText(this, "CONNECTION ERROR", Toast.LENGTH_SHORT).show();
+
+                            Log.e("MyTag", "Throwable " + error.getMessage());
+                        }
                 );
 
     }
