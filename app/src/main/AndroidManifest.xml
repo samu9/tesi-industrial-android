@@ -12,15 +12,24 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
+        android:screenOrientation="landscape"
+        android:configChanges="keyboardHidden|orientation"
+
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.MachineLogActivity"></activity>
+        <activity android:name=".activities.MachineLogActivity"
+            android:configChanges="keyboardHidden|orientation"
+            android:screenOrientation="landscape"></activity>
         <activity android:name=".activities.TestActivity2" />
 
         <meta-data
             android:name="com.google.android.glass.TouchEnabledApplication"
             android:value="true" />
 
-        <activity android:name=".activities.MainActivity">
+        <activity android:name=".activities.MainActivity"
+            android:configChanges="keyboardHidden|orientation"
+            android:screenOrientation="landscape"
+
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -33,7 +42,9 @@
         <activity
             android:name=".menu.MenuActivity"
             android:label="MenuActivity"
-            android:theme="@style/MenuTheme">
+            android:theme="@style/MenuTheme"
+            android:configChanges="keyboardHidden|orientation"
+            android:screenOrientation="landscape">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
@@ -41,7 +52,9 @@
         <activity
             android:name=".activities.DangerActivity"
             android:label="@string/title_activity_danger"
-            android:theme="@style/AppTheme">
+            android:theme="@style/AppTheme"
+            android:configChanges="keyboardHidden|orientation"
+            android:screenOrientation="landscape">
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
                 <!-- <category android:name="android.intent.category.DEFAULT" /> -->
