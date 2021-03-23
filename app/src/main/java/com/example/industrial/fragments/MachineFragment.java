@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 import static java.lang.Thread.currentThread;
@@ -146,6 +147,9 @@ public class MachineFragment extends BaseFragment {
         }
 
         machineData = new ArrayList<>();
+
+        clearData();
+
         ArrayList<MachineData> extraMachineData = (ArrayList<MachineData>) getArguments().getSerializable(MACHINE_DATA);
         if(extraMachineData != null){
             Log.i(getClass().getName(), "extraMachineData");
@@ -321,7 +325,7 @@ public class MachineFragment extends BaseFragment {
         efficiencyEntries.add(new Entry(dataCounter, data.getValues()[1]));
         machineData.add(data);
 
-        tempValue.setText(Integer.toString(data.getValues()[2]));
+        tempValue.setText(Integer.toString(data.getValues()[2]) + "°");
 
         dataCounter++;
         chartsUpdate();
@@ -348,8 +352,8 @@ public class MachineFragment extends BaseFragment {
         apiService.getMachineDataUpdate(machine.getId())
                 .repeatWhen(completed ->  completed.delay(DATA_UPDATE_DELAY, TimeUnit.MILLISECONDS)
                         .takeWhile(v -> started))
-                .observeOn(Schedulers.io())
-                .subscribeOn(Schedulers.newThread())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(machineDataUpdate -> {
                             counter.getAndIncrement();
                             Log.d(counter.toString() + " thread:" + currentThread().getId() + " data", Integer.toString(machine.getId()));
