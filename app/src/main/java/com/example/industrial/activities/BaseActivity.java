@@ -41,9 +41,9 @@ public abstract class BaseActivity extends AppCompatActivity implements GlassGes
   @Override
   protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    if (getSupportActionBar() != null) {
-      getSupportActionBar().hide();
-    }
+//    if (getSupportActionBar() != null) {
+//      getSupportActionBar().hide();
+//    }
     decorView = getWindow().getDecorView();
     decorView
         .setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
