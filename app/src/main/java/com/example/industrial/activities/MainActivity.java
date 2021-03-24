@@ -25,10 +25,14 @@ import com.example.industrial.glass.GlassGestureDetector;
 import com.example.industrial.models.Machine;
 
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class MainActivity extends BaseActivity {
@@ -96,6 +100,13 @@ public class MainActivity extends BaseActivity {
                             Log.e("MyTag", "Throwable " + error.getMessage());
                         }
                 );
+        Observable.interval(1000L, TimeUnit.MILLISECONDS)
+                .timeInterval()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(longTimed -> {
+                    timestamp.setText(new SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
+                            .format(new Timestamp(System.currentTimeMillis())));
+                });
 
     }
 
