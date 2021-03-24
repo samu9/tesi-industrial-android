@@ -82,18 +82,9 @@ public class MachineFragment extends BaseFragment {
     boolean started = false;
     boolean inDanger = false;
 
-    public MachineFragment() {
-        // Required empty public constructor
-    }
+    public MachineFragment() {}
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param machine Parameter 1.
-     * @return A new instance of fragment MachineFragment.
-     */
-    // TODO: Rename and change types and number of parameters
+
     public static MachineFragment newInstance(Serializable machine, @Nullable int menu, @Nullable Serializable machineData, boolean inDanger) {
         MachineFragment fragment = new MachineFragment();
         Bundle args = new Bundle();
@@ -123,9 +114,6 @@ public class MachineFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_machine, container, false);
-
-        View headerSeparator = v.findViewById(R.id.header_separator);
-//        headerSeparator.setBackgroundColor(inDanger? getResources().getColor(R.color.holo_red) : Color.WHITE);
 
         nameView = v.findViewById(R.id.machine_name);
         idView = v.findViewById(R.id.machine_id);
@@ -195,7 +183,7 @@ public class MachineFragment extends BaseFragment {
     @Override
     public void onResume() {
         Log.d(getClass().getName() + " " + getMachineId(), "onResume");
-        if(!menuOpened && machine.getStatus() == Machine.START && !started){
+        if(!menuOpened && machine.getStatus().equals(Machine.START) && !started){
             resumeData();
         }
         super.onResume();
@@ -355,21 +343,24 @@ public class MachineFragment extends BaseFragment {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(machineDataUpdate -> {
-                            counter.getAndIncrement();
-                            Log.d(counter.toString() + " thread:" + currentThread().getId() + " data", Integer.toString(machine.getId()));
+                    if(!started){
+                        return;
+                    }
+                    counter.getAndIncrement();
+                    Log.d(counter.toString() + " thread:" + currentThread().getId() + " data", Integer.toString(machine.getId()));
 
-                            boolean dataCheck = machine.checkData(machineDataUpdate);
-                            if(!dataCheck && !inDanger){
-                                Log.i(getClass().getName() + " " + machine.getId(), "data check failed");
-                                goToDangerMode();
-                            }
-                            // danger mode risolta, posso ritornare
-                            if(dataCheck && inDanger){
-                                backToNormalMode();
-                            }
-                            addData(machineDataUpdate);
-                        },
-                        Throwable::printStackTrace);
+                    boolean dataCheck = machine.checkData(machineDataUpdate);
+                    if(!dataCheck && !inDanger){
+                        Log.i(getClass().getName() + " " + machine.getId(), "data check failed");
+                        goToDangerMode();
+                    }
+                    // danger mode risolta, posso ritornare
+                    if(dataCheck && inDanger){
+                        backToNormalMode();
+                    }
+                    addData(machineDataUpdate);
+                },
+                Throwable::printStackTrace);
     }
 
     public void pauseData() { started = false;}
@@ -380,6 +371,10 @@ public class MachineFragment extends BaseFragment {
     }
 
     public void resumeData(){
+        // fix resume on paused machine on app startup
+        if(started){
+            return;
+        }
         started = true;
         startGetData();
     }
@@ -498,7 +493,8 @@ public class MachineFragment extends BaseFragment {
     }
 
     public void resolveDanger(){
-        apiService.commandMachine(getMachineId(), "resolve").subscribe(apiResult -> {
+        apiService.commandMachine(getMachineId(), "resolve")
+                .subscribe(apiResult -> {
 //            if(apiResult.getResult()){
 //                Intent intent = new Intent();
 //                getActivity().setResult(DangerActivity.RESULT_DANGER, intent);
