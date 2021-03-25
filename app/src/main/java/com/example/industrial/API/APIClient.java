@@ -1,23 +1,8 @@
 package com.example.industrial.API;
 
-import com.example.industrial.menu.APIResult;
-import com.example.industrial.models.Area;
-import com.example.industrial.models.Areas;
-import com.example.industrial.models.Location;
-import com.example.industrial.models.Machine;
-import com.example.industrial.models.MachineData;
-import com.example.industrial.models.MachineLog;
-import com.example.industrial.models.Sector;
-
-import java.util.ArrayList;
-import java.util.List;
-import io.reactivex.rxjava3.core.Observable;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.http.GET;
-import retrofit2.http.POST;
-import retrofit2.http.Path;
 
 public class APIClient {
 
