@@ -19,8 +19,10 @@
         android:orientation="horizontal"
         android:paddingVertical="15dp">
         <TextView
+            android:textSize="24dp"
+            android:id="@+id/instruction_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Help message"></TextView>
+            android:text=""></TextView>
     </LinearLayout>
 </LinearLayout>
