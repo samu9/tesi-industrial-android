@@ -57,7 +57,7 @@ public class MachineFragment extends BaseFragment {
     protected static final String IN_DANGER_KEY = "in danger";
 
     private static final int MAX_DATA_BARS = 10;
-    private static final int DATA_UPDATE_DELAY = 2000;
+    private static final int DATA_UPDATE_DELAY = 1000;
 
     private static boolean menuOpened = false;
 
