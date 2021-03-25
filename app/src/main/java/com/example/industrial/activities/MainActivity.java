@@ -60,8 +60,6 @@ public class MainActivity extends BaseActivity {
         viewPager = findViewById(R.id.body_layout);
         viewPager.setAdapter(screenSlidePagerAdapter);
 
-        timestamp.setText("timestamp");
-
         APIInterface apiService = APIClient.getInstance().create(APIInterface.class);
 
         apiService.getCurrentPosition()
