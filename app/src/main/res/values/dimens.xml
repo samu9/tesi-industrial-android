@@ -19,4 +19,7 @@
 
     <dimen name="menu_icon_size">24dp</dimen>
 
+    <dimen name="overlay_help_width">300dp</dimen>
+    <dimen name="overlay_help_height">150dp</dimen>
+
 </resources>
