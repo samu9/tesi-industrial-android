@@ -61,6 +61,8 @@ public class MachineFragment extends BaseFragment {
 
     private static boolean menuOpened = false;
 
+    // inform the fragment an overlay is present
+    private boolean overlay = false;
  
     private Machine machine;
 
@@ -174,14 +176,20 @@ public class MachineFragment extends BaseFragment {
 
     @Override
     public void onPause() {
-        if(!menuOpened && inDanger){
+        if(!menuOpened && inDanger && !overlay){
             pauseData();
         }
         super.onPause();
     }
 
+    public void onOverlay(){
+        overlay = true;
+    }
+
     @Override
     public void onResume() {
+        overlay = false;
+
         Log.d(getClass().getName() + " " + getMachineId(), "onResume");
         if(!menuOpened && machine.getStatus().equals(Machine.START) && !started){
             resumeData();
