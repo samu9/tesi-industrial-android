@@ -2,6 +2,7 @@ package com.example.industrial.API;
 
 import com.example.industrial.models.APIResult;
 import com.example.industrial.models.Area;
+import com.example.industrial.models.InstructionMessage;
 import com.example.industrial.models.Location;
 import com.example.industrial.models.Machine;
 import com.example.industrial.models.MachineData;
@@ -47,5 +48,5 @@ public interface APIInterface {
     Observable<APIResult> commandMachine(@Path("id") int id, @Path("command") String command);
 
     @GET("machine/{id}/danger/instruction")
-    Observable<APIResult> getDangerInstruction(@Path("id") int id);
+    Observable<InstructionMessage> getDangerInstruction(@Path("id") int id);
 }
