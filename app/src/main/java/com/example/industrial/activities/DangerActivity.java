@@ -85,7 +85,16 @@ public class DangerActivity extends BaseActivity {
             if (id == R.id.next_instruction){
                 apiService.getDangerInstruction(machine.getId())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(apiResult -> instructionMessage.setText(apiResult.getMessage()));
+                        .subscribe(instructionMessage -> {
+                            this.instructionMessage.setText(instructionMessage.getMessage());
+                            if(instructionMessage.getAssistant() != null){
+                                fragment.onOverlay();
+                                Log.d(getClass().getSimpleName(), instructionMessage.getAssistant().getName());
+                                Intent intent = new Intent(this, OverlayHelpActivity.class);
+                                intent.putExtra(OverlayHelpActivity.ASSISTANT_EXTRA, instructionMessage.getAssistant());
+                                startActivity(intent);
+                            }
+                        });
                 Log.e(getClass().getSimpleName(),"next instruction");
             }
         }
