@@ -1,0 +1,81 @@
+/*
+ * Copyright 2019 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.example.industrial.camera;
+
+import android.content.Context;
+import android.graphics.drawable.TransitionDrawable;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
+
+import com.example.industrial.R;
+
+/**
+ * Helper class responsible for performing animations on the camera shutter during taking pictures
+ * and changing shutter icon to the camera icon and vice versa, depends on the current camera mode.
+ */
+public class AnimationManager {
+
+  /**
+   * Minimum alpha for animations.
+   */
+  private static final float ALPHA_MIN = 0F;
+
+  /**
+   * Maximum alpha for animations.
+   */
+  private static final float ALPHA_MAX = 0.8F;
+
+  /**
+   * Transition duration in milliseconds,
+   */
+  private static final int TRANSITION_DURATION_MS = 200;
+
+  /**
+   * Animates shutter action on the given {@link ImageView}.
+   */
+  public static void animateShutter(Context context, ImageView imageView) {
+    imageView.startAnimation(AnimationUtils.loadAnimation(context, R.anim.alpha));
+  }
+
+  /**
+   * Changes given {@link ImageView} image resource by the animation using alpha.
+   */
+  public static void changeImageByAlpha(final ImageView imageView, final int resource) {
+    imageView.animate().alpha(ALPHA_MIN).withEndAction(new Runnable() {
+      @Override
+      public void run() {
+        imageView.setImageResource(resource);
+        imageView.animate().alpha(ALPHA_MAX);
+      }
+    });
+  }
+
+  /**
+   * Performs transition on the image background to change highlight of a given {@link ImageView}.
+   *
+   * @param reverse true means reverse transition.
+   */
+  public static void changeBackgroundDrawable(final ImageView imageView, final boolean reverse) {
+    final TransitionDrawable transitionDrawable = (TransitionDrawable) imageView.getBackground();
+
+    if (reverse) {
+      transitionDrawable.reverseTransition(TRANSITION_DURATION_MS);
+    } else {
+      transitionDrawable.startTransition(TRANSITION_DURATION_MS);
+    }
+  }
+}

@@ -22,4 +22,8 @@
     <dimen name="overlay_help_width">300dp</dimen>
     <dimen name="overlay_help_height">150dp</dimen>
 
+    <dimen name="icon_size">48dp</dimen>
+    <dimen name="icon_margin">16dp</dimen>
+    <dimen name="icon_padding">8dp</dimen>
+
 </resources>
