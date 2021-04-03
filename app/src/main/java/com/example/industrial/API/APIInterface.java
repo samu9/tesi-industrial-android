@@ -13,11 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.rxjava3.core.Observable;
-import okhttp3.MultipartBody;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
-import retrofit2.http.Multipart;
 import retrofit2.http.POST;
-import retrofit2.http.Part;
 import retrofit2.http.Path;
 
 public interface APIInterface {
@@ -54,5 +52,8 @@ public interface APIInterface {
     Observable<InstructionMessage> getDangerInstruction(@Path("id") int id);
 
     @POST("machine/{id}/image")
-    Observable<APIResult> uploadMachineImage(@Part MultipartBody.Part image);
+    Observable<APIResult> uploadMachineImage(@Path("id") int id, @Body String data);
+
+    @GET("machine/{id}/image")
+    Observable<List<String>> getMachineImages(@Path("id") int id);
 }
