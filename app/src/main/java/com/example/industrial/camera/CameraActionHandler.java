@@ -19,6 +19,8 @@ package com.example.industrial.camera;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCaptureSession.CaptureCallback;
@@ -29,15 +31,23 @@ import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.media.Image;
 import android.media.ImageReader;
 import android.media.ImageReader.OnImageAvailableListener;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Surface;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.example.industrial.API.APIClient;
+import com.example.industrial.API.APIInterface;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -147,6 +157,9 @@ public class CameraActionHandler implements OnImageAvailableListener {
    */
   private boolean isCameraOpenedInVideoModeViaIntent = false;
 
+  private APIInterface apiService;
+
+
   /**
    * {@link CameraDevice.StateCallback} is called when {@link CameraDevice} changes its state.
    */
@@ -188,6 +201,7 @@ public class CameraActionHandler implements OnImageAvailableListener {
     cameraManager = (CameraManager) Objects.requireNonNull(context, "Context must not be null")
         .getSystemService(Context.CAMERA_SERVICE);
     cameraCaptureSessionController = new CameraCaptureSessionController();
+    apiService = APIClient.getInstance().create(APIInterface.class);
   }
 
   /**
@@ -568,7 +582,31 @@ public class CameraActionHandler implements OnImageAvailableListener {
   @Override
   public void onImageAvailable(ImageReader reader) {
     Log.d(TAG, "Image is available");
-    FileManager.saveImage(context, reader);
+
+//    FileManager.saveImage(context, reader);
+    postImage(context, reader);
+  }
+
+  public void postImage(final Context context, final ImageReader imageReader){
+    File f = new File(context.getCacheDir(), "temp");
+
+    Log.d(TAG, "Uploading image");
+    final Image image = imageReader.acquireNextImage();
+    final ByteBuffer buffer = image.getPlanes()[0].getBuffer();
+    final byte[] bytes = new byte[buffer.remaining()];
+    buffer.get(bytes);
+    final Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+
+
+    //Convert bitmap to byte array
+    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    bitmap.compress(Bitmap.CompressFormat.JPEG, 100 /*ignored for PNG*/, bos);
+
+    String encoded = Base64.encodeToString(bos.toByteArray(), Base64.NO_WRAP);
+
+    image.close();
+
+    apiService.uploadMachineImage(1, encoded).subscribe(apiResult -> Log.i(TAG, apiResult.getMessage()));
   }
 
   /**
