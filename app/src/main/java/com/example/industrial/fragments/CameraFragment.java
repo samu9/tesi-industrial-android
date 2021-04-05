@@ -37,6 +37,8 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 
+import com.example.industrial.API.APIClient;
+import com.example.industrial.API.APIInterface;
 import com.example.industrial.R;
 import com.example.industrial.camera.AnimationManager;
 import com.example.industrial.camera.CameraActionHandler;
@@ -50,6 +52,8 @@ import java.util.Objects;
 public class CameraFragment extends Fragment
     implements ActivityCompat.OnRequestPermissionsResultCallback, GlassGestureDetector.OnGestureListener,
         CameraActionHandler.CameraActionHandlerCallback {
+
+
 
   private static final String TAG = CameraFragment.class.getSimpleName();
 
@@ -93,6 +97,8 @@ public class CameraFragment extends Fragment
    * Flag indicating if the long press action has been performed.
    */
   private boolean isLongPressPerformed = false;
+
+
 
   /**
    * {@link TextureView.SurfaceTextureListener} handles several lifecycle events on a {@link
@@ -197,12 +203,12 @@ public class CameraFragment extends Fragment
       case TAP:
         cameraActionHandler.performTapAction();
         return true;
-      case SWIPE_FORWARD:
-        cameraActionHandler.performSwipeForwardAction();
-        return true;
-      case SWIPE_BACKWARD:
-        cameraActionHandler.performSwipeBackwardAction();
-        return true;
+//      case SWIPE_FORWARD:
+//        cameraActionHandler.performSwipeForwardAction();
+//        return true;
+//      case SWIPE_BACKWARD:
+//        cameraActionHandler.performSwipeBackwardAction();
+//        return true;
       case SWIPE_DOWN:
         requireActivity().finish();
         return true;
