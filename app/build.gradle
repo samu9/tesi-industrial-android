@@ -2,6 +2,14 @@ plugins {
     id 'com.android.application'
 }
 
+def secretsPropertiesFile = new File("secrets.properties")
+
+// Initializes a new Properties() object called keystoreProperties.
+def secretsProperties = new Properties()
+
+// Loads the keystore.properties file into the keystoreProperties object.
+secretsProperties.load(new FileInputStream(secretsPropertiesFile))
+
 android {
     compileSdkVersion 30
 
@@ -19,6 +27,11 @@ android {
     }
 
     buildTypes {
+        applicationVariants.all { variant ->
+            variant.buildConfigField "String", "API_KEY", "\""+secretsProperties['API_KEY']+"\""
+            variant.buildConfigField "String", "BASE_URL", "\""+secretsProperties['BASE_URL']+"\""
+
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
