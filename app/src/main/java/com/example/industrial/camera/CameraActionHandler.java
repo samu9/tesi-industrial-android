@@ -603,10 +603,12 @@ public class CameraActionHandler implements OnImageAvailableListener {
     bitmap.compress(Bitmap.CompressFormat.JPEG, 100 /*ignored for PNG*/, bos);
 
     String encoded = Base64.encodeToString(bos.toByteArray(), Base64.NO_WRAP);
-
     image.close();
 
-    apiService.uploadMachineImage(1, encoded).subscribe(apiResult -> Log.i(TAG, apiResult.getMessage()));
+    apiService.uploadMachineImage(1, encoded).subscribe(
+            apiResult -> Log.i(TAG, apiResult.getMessage()),
+            Throwable::printStackTrace
+    );
   }
 
   /**
