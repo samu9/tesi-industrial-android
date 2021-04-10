@@ -17,9 +17,16 @@
 package com.example.industrial.fragments;
 
 import android.Manifest.permission;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.SurfaceTexture;
+import android.media.Image;
+import android.media.ImageReader;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -29,6 +36,7 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -43,7 +51,11 @@ import com.example.industrial.R;
 import com.example.industrial.camera.AnimationManager;
 import com.example.industrial.camera.CameraActionHandler;
 import com.example.industrial.glass.GlassGestureDetector;
+import com.example.industrial.menu.MenuActivity;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.nio.ByteBuffer;
 import java.util.Objects;
 
 /**
@@ -51,12 +63,12 @@ import java.util.Objects;
  */
 public class CameraFragment extends Fragment
     implements ActivityCompat.OnRequestPermissionsResultCallback, GlassGestureDetector.OnGestureListener,
-        CameraActionHandler.CameraActionHandlerCallback {
-
-
+        CameraActionHandler.CameraActionHandlerCallback{
 
   private static final String TAG = CameraFragment.class.getSimpleName();
 
+  private static final String MENU_KEY = "menu_key";
+  private static final int MENU_REQUEST_CODE = 100;
   /**
    * Request code for the camera permission. This value doesn't have any special meaning.
    */
@@ -98,7 +110,11 @@ public class CameraFragment extends Fragment
    */
   private boolean isLongPressPerformed = false;
 
+  private int machineId;
 
+  private APIInterface apiService;
+
+  private Bitmap currentImageBitmap;
 
   /**
    * {@link TextureView.SurfaceTextureListener} handles several lifecycle events on a {@link
@@ -130,10 +146,50 @@ public class CameraFragment extends Fragment
     }
   };
 
+  public void setMachineId(int machineId){
+    this.machineId = machineId;
+  }
+
+  @Override
+  public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
+    if (resultCode == MenuActivity.RESULT_MENU && data != null) {
+      final int id = data.getIntExtra(MenuActivity.EXTRA_MENU_ITEM_ID_KEY,
+              MenuActivity.EXTRA_MENU_ITEM_DEFAULT_VALUE);
+      Log.d(TAG,"menu result: " + id);
+
+      if(id == R.id.save){
+        Toast.makeText(getActivity(),"Uploading image", Toast.LENGTH_LONG).show();
+        postImage(currentImageBitmap);
+      }
+      if(id == R.id.discard){
+        Toast.makeText(getActivity(),"Image discarded", Toast.LENGTH_LONG).show();
+      }
+    }
+  }
+
+  public void postImage(Bitmap imageBitmap){
+    Log.d(TAG, "Uploading image");
+
+    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100 /*ignored for PNG*/, bos);
+
+    String encoded = Base64.encodeToString(bos.toByteArray(), Base64.NO_WRAP);
+
+    apiService.uploadMachineImage(machineId, encoded).subscribe(
+            apiResult -> {
+              Log.i(TAG, apiResult.getMessage());
+            },
+            Throwable::printStackTrace
+    );
+  }
+
   @Override
   public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                            Bundle savedInstanceState) {
     return inflater.inflate(R.layout.camera_layout, container, false);
+
+
   }
 
   @Override
@@ -149,6 +205,8 @@ public class CameraFragment extends Fragment
     super.onActivityCreated(savedInstanceState);
     cameraActionHandler = new CameraActionHandler(getContext(), this);
     cameraActionHandler.handleIntent(requireActivity().getIntent());
+
+    apiService = APIClient.getInstance().create(APIInterface.class);
   }
 
   @Override
@@ -203,12 +261,6 @@ public class CameraFragment extends Fragment
       case TAP:
         cameraActionHandler.performTapAction();
         return true;
-//      case SWIPE_FORWARD:
-//        cameraActionHandler.performSwipeForwardAction();
-//        return true;
-//      case SWIPE_BACKWARD:
-//        cameraActionHandler.performSwipeBackwardAction();
-//        return true;
       case SWIPE_DOWN:
         requireActivity().finish();
         return true;
@@ -283,6 +335,16 @@ public class CameraFragment extends Fragment
     }
   }
 
+  @Override
+  public void imageConfirm(Bitmap imageBitmap) {
+    Log.i(TAG, "Image Ready");
+
+    currentImageBitmap = imageBitmap.copy(imageBitmap.getConfig(),false);
+    Intent intent = new Intent(getActivity(), MenuActivity.class);
+    intent.putExtra(MenuActivity.EXTRA_MENU_KEY, R.menu.camera_menu);
+    startActivityForResult(intent, MENU_REQUEST_CODE);
+  }
+
   private Surface getSurface(SurfaceTexture surfaceTexture) {
     final DisplayMetrics displayMetrics = new DisplayMetrics();
     Objects.requireNonNull(getActivity(), "Activity must not be null").getWindowManager()
@@ -290,4 +352,5 @@ public class CameraFragment extends Fragment
     surfaceTexture.setDefaultBufferSize(displayMetrics.widthPixels, displayMetrics.heightPixels);
     return new Surface(surfaceTexture);
   }
+
 }

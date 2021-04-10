@@ -583,33 +583,18 @@ public class CameraActionHandler implements OnImageAvailableListener {
   public void onImageAvailable(ImageReader reader) {
     Log.d(TAG, "Image is available");
 
-//    FileManager.saveImage(context, reader);
-    postImage(context, reader);
-  }
+    Image image = reader.acquireLatestImage();
+    ByteBuffer buffer = image.getPlanes()[0].getBuffer();
 
-  public void postImage(final Context context, final ImageReader imageReader){
-    File f = new File(context.getCacheDir(), "temp");
-
-    Log.d(TAG, "Uploading image");
-    final Image image = imageReader.acquireNextImage();
-    final ByteBuffer buffer = image.getPlanes()[0].getBuffer();
     final byte[] bytes = new byte[buffer.remaining()];
     buffer.get(bytes);
     final Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
 
-
-    //Convert bitmap to byte array
-    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    bitmap.compress(Bitmap.CompressFormat.JPEG, 100 /*ignored for PNG*/, bos);
-
-    String encoded = Base64.encodeToString(bos.toByteArray(), Base64.NO_WRAP);
+    cameraActionHandlerCallback.imageConfirm(bitmap);
     image.close();
-
-    apiService.uploadMachineImage(1, encoded).subscribe(
-            apiResult -> Log.i(TAG, apiResult.getMessage()),
-            Throwable::printStackTrace
-    );
   }
+
+
 
   /**
    * Available camera modes.
@@ -630,5 +615,7 @@ public class CameraActionHandler implements OnImageAvailableListener {
     void onVideoRecordingStopped();
 
     void onCameraModeChanged(CameraMode newCameraMode);
+
+    void imageConfirm(Bitmap imageBitmap);
   }
 }
