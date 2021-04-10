@@ -7,9 +7,13 @@ import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureRequest;
+import android.hardware.camera2.CaptureRequest.Builder;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Size;
+import android.util.SparseIntArray;
 import android.view.KeyEvent;
+import android.view.Surface;
 import android.view.TextureView;
 import android.widget.ImageView;
 
@@ -18,15 +22,20 @@ import com.example.industrial.fragments.CameraFragment;
 import com.example.industrial.glass.GlassGestureDetector;
 
 public class CameraActivity extends BaseActivity {
+    public static final String MACHINE_ID_EXTRA = "machine id";
 
-    private ImageView cameraBtn;
-    private TextureView textureView;
+    private static final String TAG = CameraActivity.class.getSimpleName();
 
-    private String cameraId;
-    private CameraDevice cameraDevice;
-    private CameraCaptureSession cameraCaptureSession;
-    private CaptureRequest.Builder captureRequestBuilder;
-    private Size image;
+    private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
+
+    private int machineId;
+
+    static {
+        ORIENTATIONS.append(Surface.ROTATION_0, 90);
+        ORIENTATIONS.append(Surface.ROTATION_90, 0);
+        ORIENTATIONS.append(Surface.ROTATION_180, 270);
+        ORIENTATIONS.append(Surface.ROTATION_270, 180);
+    }
 
     private CameraFragment cameraFragment;
 
@@ -34,31 +43,18 @@ public class CameraActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
+
+        machineId = getIntent().getIntExtra(MACHINE_ID_EXTRA, -1);
+
         cameraFragment = (CameraFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.camera_fragment);
+        cameraFragment.setMachineId(machineId);
 
-//        textureView = findViewById(R.id.cameraTextureView);
-//        textureView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
-//            @Override
-//            public void onSurfaceTextureAvailable(@NonNull SurfaceTexture surface, int width, int height) {
-//                openCamera();
-//            }
-//
-//            @Override
-//            public void onSurfaceTextureSizeChanged(@NonNull SurfaceTexture surface, int width, int height) {
-//
-//            }
-//
-//            @Override
-//            public boolean onSurfaceTextureDestroyed(@NonNull SurfaceTexture surface) {
-//                return false;
-//            }
-//
-//            @Override
-//            public void onSurfaceTextureUpdated(@NonNull SurfaceTexture surface) {
-//
-//            }
-//        });
+        int rotation = getWindowManager().getDefaultDisplay().getRotation();
+        int orientation = getResources().getConfiguration().orientation;
+
+        Log.i(TAG, "orientation: " + orientation);
+
     }
 
     @Override
@@ -75,4 +71,12 @@ public class CameraActivity extends BaseActivity {
     public boolean onKeyLongPress(int keyCode, KeyEvent event) {
         return cameraFragment.onKeyLongPress(keyCode) || super.onKeyLongPress(keyCode, event);
     }
+
+//    private int getOrientation(int rotation) {
+//        // Sensor orientation is 90 for most devices, or 270 for some devices (eg. Nexus 5X)
+//        // We have to take that into account and rotate JPEG properly.
+//        // For devices with orientation of 90, we simply return our mapping from ORIENTATIONS.
+//        // For devices with orientation of 270, we need to rotate the JPEG 180 degrees.
+//        return (ORIENTATIONS.get(rotation) + mSensorOrientation + 270) % 360;
+//    }
 }
