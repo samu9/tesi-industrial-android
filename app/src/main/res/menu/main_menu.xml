@@ -7,5 +7,7 @@
   <item android:id="@+id/pause" android:title="Pause"/>
   <item android:id="@+id/resume" android:title="Resume"/>
   <item android:id="@+id/stop" android:title="Stop"/>
+  <item android:id="@+id/take_photo" android:title="Take photo"/>
   <item android:id="@+id/log_menu_item" android:title="Log"/>
+
 </menu>

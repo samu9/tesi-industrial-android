@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.example.industrial.API.APIClient;
 import com.example.industrial.API.APIInterface;
 import com.example.industrial.R;
+import com.example.industrial.activities.CameraActivity;
 import com.example.industrial.activities.DangerActivity;
 import com.example.industrial.activities.MachineLogActivity;
 import com.example.industrial.menu.MenuActivity;
@@ -243,6 +244,9 @@ public class MachineFragment extends BaseFragment {
                 case R.id.log_menu_item:
                     goToLogs();
                     break;
+                case R.id.take_photo:
+                    takePhoto();
+
             }
             if(message != null){
                 Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
@@ -483,6 +487,13 @@ public class MachineFragment extends BaseFragment {
         Intent intent = new Intent(getActivity(), MachineLogActivity.class);
         intent.putExtra(MachineLogActivity.MACHINE_ID_EXTRA, machine.getId());
         startActivity(intent);
+    }
+
+    private void takePhoto(){
+        Intent intent = new Intent(getActivity(), CameraActivity.class);
+        intent.putExtra(CameraActivity.MACHINE_ID_EXTRA, machine.getId());
+        startActivity(intent);
+
     }
 
     private void sendDangerMode(){
