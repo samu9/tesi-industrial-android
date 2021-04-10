@@ -48,6 +48,7 @@ import info.androidhive.fontawesome.FontDrawable;
  * between menu items.
  */
 public class MenuActivity extends BaseActivity implements GlassGestureDetector.OnGestureListener {
+  private static final String TAG = MenuActivity.class.getSimpleName();
 
   public static final int RESULT_MENU = 1000;
 
@@ -102,28 +103,34 @@ public class MenuActivity extends BaseActivity implements GlassGestureDetector.O
         .getIntExtra(EXTRA_MENU_KEY, EXTRA_MENU_ITEM_DEFAULT_VALUE);
 
     String machineStatus = getIntent().getStringExtra(EXTRA_MACHINE_STATUS_KEY);
-
-    if (menuResource != EXTRA_MENU_ITEM_DEFAULT_VALUE) {
+    Log.d(TAG, "machineStatus:" + machineStatus);
+    if (menuResource != EXTRA_MENU_ITEM_DEFAULT_VALUE ) {
       final MenuInflater inflater = getMenuInflater();
       inflater.inflate(menuResource, menu);
 
+
+
       for (int i = 0; i < menu.size(); i++) {
         final MenuItem menuItem = menu.getItem(i);
-        if(machineStatus.equals(Machine.STOP) && menuItem.getItemId() == R.id.go_to_danger){
-          continue;
+
+        if(machineStatus != null) {
+          if (machineStatus.equals(Machine.STOP) && menuItem.getItemId() == R.id.go_to_danger) {
+            continue;
+          }
+          if (!machineStatus.equals(Machine.PAUSE) && menuItem.getItemId() == R.id.resume) {
+            continue;
+          }
+          if ((machineStatus.equals(Machine.START) || machineStatus.equals(Machine.PAUSE)) && menuItem.getItemId() == R.id.start) {
+            continue;
+          }
+          if (machineStatus.equals(Machine.PAUSE) && menuItem.getItemId() == R.id.pause) {
+            continue;
+          }
+          if (machineStatus.equals(Machine.STOP) && (menuItem.getItemId() == R.id.stop || menuItem.getItemId() == R.id.pause)) {
+            continue;
+          }
         }
-        if(!machineStatus.equals(Machine.PAUSE) && menuItem.getItemId() == R.id.resume){
-          continue;
-        }
-        if((machineStatus.equals(Machine.START) || machineStatus.equals(Machine.PAUSE)) && menuItem.getItemId() == R.id.start){
-          continue;
-        }
-        if(machineStatus.equals(Machine.PAUSE) && menuItem.getItemId() == R.id.pause){
-          continue;
-        }
-        if(machineStatus.equals(Machine.STOP) && (menuItem.getItemId() == R.id.stop || menuItem.getItemId() == R.id.pause)){
-          continue;
-        }
+
 
         FontDrawable icon;
         switch (menuItem.getItemId()){
@@ -141,6 +148,15 @@ public class MenuActivity extends BaseActivity implements GlassGestureDetector.O
             break;
           case R.id.log_menu_item:
             icon =  new FontDrawable(this, R.string.fa_file_alt,true,false);
+            break;
+          case R.id.save:
+            icon = new FontDrawable(this,R.string.fa_cloud_upload_alt_solid, true,false);
+            break;
+          case R.id.discard:
+            icon = new FontDrawable(this,R.string.fa_trash_alt, true, false);
+            break;
+          case R.id.take_photo:
+            icon = new FontDrawable(this,R.string.fa_camera_solid,true,false);
             break;
 //          case R.id.power_off:
 //            icon =  new FontDrawable(this, R.string.fa_power_off_solid,true,false);
