@@ -275,18 +275,18 @@ public class CameraActionHandler implements OnImageAvailableListener {
       case PICTURE:
         takePicture();
         break;
-      case VIDEO:
-        if (isVideoCaptureSessionPreparing) {
-          return;
-        }
-        isVideoCaptureSessionPreparing = true;
-        if (videoRecorder.isRecording()) {
-          stopRecording();
-          createCameraPreviewSession();
-        } else {
-          startRecording();
-        }
-        break;
+//      case VIDEO:
+//        if (isVideoCaptureSessionPreparing) {
+//          return;
+//        }
+//        isVideoCaptureSessionPreparing = true;
+//        if (videoRecorder.isRecording()) {
+//          stopRecording();
+//          createCameraPreviewSession();
+//        } else {
+//          startRecording();
+//        }
+//        break;
     }
   }
 
