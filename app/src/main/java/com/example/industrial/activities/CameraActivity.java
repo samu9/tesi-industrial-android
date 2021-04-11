@@ -9,6 +9,7 @@ import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureRequest.Builder;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
@@ -44,16 +45,20 @@ public class CameraActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
 
-        machineId = getIntent().getIntExtra(MACHINE_ID_EXTRA, -1);
+        machineId = getIntent().getIntExtra(MACHINE_ID_EXTRA, 1);
+        int rotation = getWindowManager().getDefaultDisplay().getRotation();
+
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
 
         cameraFragment = (CameraFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.camera_fragment);
         cameraFragment.setMachineId(machineId);
+        cameraFragment.setRotation(rotation);
+        cameraFragment.setScreenSize(displayMetrics.widthPixels, displayMetrics.heightPixels);
 
-        int rotation = getWindowManager().getDefaultDisplay().getRotation();
-        int orientation = getResources().getConfiguration().orientation;
 
-        Log.i(TAG, "orientation: " + orientation);
+        Log.i(TAG, "rotation:" + rotation);
 
     }
 
