@@ -290,40 +290,6 @@ public class CameraActionHandler implements OnImageAvailableListener {
     }
   }
 
-  /**
-   * Performs action on {@link com.example.industrial.glass.GlassGestureDetector.Gesture#SWIPE_FORWARD}
-   * gesture.
-   */
-  public void performSwipeForwardAction() {
-    Log.d(TAG, "Performing swipe forward action");
-    switchCameraMode(CameraMode.VIDEO);
-  }
-
-  /**
-   * Performs action on {@link com.example.industrial.glass.GlassGestureDetector.Gesture#SWIPE_BACKWARD}
-   * gesture.
-   */
-  public void performSwipeBackwardAction() {
-    Log.d(TAG, "Performing swipe backward action");
-    switchCameraMode(CameraMode.PICTURE);
-  }
-
-  /**
-   * Performs action on camera button short press event. Possible scenarios:
-   * <ol>
-   * <li>
-   * If {@link CameraMode} is set to {@link CameraMode#PICTURE}, picture will be taken.
-   * </li>
-   * <li>
-   * If {@link CameraMode} is set to {@link CameraMode#VIDEO} and video is recording, recording will
-   * be stopped.
-   * </li>
-   * <li>
-   * If {@link CameraMode} is set to {@link CameraMode#VIDEO} and video is not recording, {@link
-   * CameraMode} will be changed to the {@link CameraMode#PICTURE} and picture will be taken.
-   * </li>
-   * </ol>
-   */
   public void performCameraButtonPress() {
     if (isCameraOpenedInVideoModeViaIntent) {
       isCameraOpenedInVideoModeViaIntent = false;
