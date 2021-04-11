@@ -27,7 +27,7 @@
             android:screenOrientation="landscape"
             android:theme="@style/AppTheme">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+<!--                <action android:name="android.intent.action.MAIN" />-->
 
                 <category android:name="android.intent.category.LAUNCHER" />
 
@@ -58,9 +58,9 @@
             android:configChanges="keyboardHidden|orientation"
             android:screenOrientation="landscape">
             <intent-filter>
-<!--                <action android:name="android.intent.action.MAIN" />-->
+                <action android:name="android.intent.action.MAIN" />
 
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+                <category android:name="android.intent.category.LAUNCHER" />
 
                 <!-- categoria per mostrare l'applicazione nel menu del Glass -->
                 <category android:name="com.google.android.glass.category.DIRECTORY" />
