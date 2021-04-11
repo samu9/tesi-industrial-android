@@ -17,11 +17,14 @@
 package com.example.industrial.fragments;
 
 import android.Manifest.permission;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.media.Image;
 import android.media.ImageReader;
@@ -111,6 +114,9 @@ public class CameraFragment extends Fragment
   private boolean isLongPressPerformed = false;
 
   private int machineId;
+  private int rotation;
+  private int screenWidth;
+  private int screenHeight;
 
   private APIInterface apiService;
 
@@ -133,6 +139,7 @@ public class CameraFragment extends Fragment
     @Override
     public void onSurfaceTextureSizeChanged(SurfaceTexture texture, int width, int height) {
       Log.d(TAG, "Surface texture size changed");
+
     }
 
     @Override
@@ -148,6 +155,11 @@ public class CameraFragment extends Fragment
 
   public void setMachineId(int machineId){
     this.machineId = machineId;
+  }
+  public void setRotation(int rotation) { this.rotation = rotation;}
+  public void setScreenSize(int width, int height){
+    screenWidth = width;
+    screenHeight = height;
   }
 
   @Override
@@ -196,6 +208,8 @@ public class CameraFragment extends Fragment
   public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
     textureView = view.findViewById(R.id.cameraTextureView);
+//    textureView.setRotation(-90);
+
     shutterImageView = view.findViewById(R.id.cameraImageView);
 //    videoImageView = view.findViewById(R.id.videoImageView);
   }
@@ -207,6 +221,25 @@ public class CameraFragment extends Fragment
     cameraActionHandler.handleIntent(requireActivity().getIntent());
 
     apiService = APIClient.getInstance().create(APIInterface.class);
+  }
+
+  private void transformImage(){
+    if(textureView == null){
+      return;
+    }
+    Matrix matrix = new Matrix();
+    RectF textureRectF = new RectF(0, 0, screenWidth, screenHeight);
+    RectF previewRectF = new RectF(0, 0, screenHeight, screenWidth);
+    float centerX = textureRectF.centerX();
+    float centerY = textureRectF.centerY();
+    if(rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270){
+      previewRectF.offset(centerX - previewRectF.centerX(), centerY - previewRectF.centerY());
+      matrix.setRectToRect(textureRectF, previewRectF, Matrix.ScaleToFit.FILL);
+      float scale = Math.max((float) screenWidth / screenWidth, (float) screenHeight / screenHeight);
+      matrix.postScale(scale, scale, centerX, centerY);
+      matrix.postRotate(90 * (rotation - 2), centerX, centerY);
+    }
+    textureView.setTransform(matrix);
   }
 
   @Override
@@ -229,6 +262,8 @@ public class CameraFragment extends Fragment
       cameraActionHandler.openCamera();
     } else {
       textureView.setSurfaceTextureListener(surfaceTextureListener);
+      transformImage();
+
     }
   }
 
