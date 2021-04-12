@@ -21,19 +21,31 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
 
+
+        <activity android:name=".activities.ThreeDModelActivity"
+            android:configChanges="keyboardHidden|orientation"
+            android:screenOrientation="landscape"
+            android:theme="@style/AppTheme">
+            <intent-filter>
+
+<!--                 <action android:name="android.intent.action.MAIN" />-->
+                <category android:name="android.intent.category.LAUNCHER" />
+
+            </intent-filter>
+
+        </activity>
         <activity
             android:name=".activities.CameraActivity"
             android:configChanges="keyboardHidden|orientation"
             android:screenOrientation="landscape"
             android:theme="@style/AppTheme">
             <intent-filter>
-<!--                <action android:name="android.intent.action.MAIN" />-->
+
+                <!-- <action android:name="android.intent.action.MAIN" /> -->
 
                 <category android:name="android.intent.category.LAUNCHER" />
-
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activities.OverlayHelpActivity"
             android:configChanges="keyboardHidden|orientation"
