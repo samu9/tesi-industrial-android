@@ -158,6 +158,9 @@ public class MenuActivity extends BaseActivity implements GlassGestureDetector.O
           case R.id.take_photo:
             icon = new FontDrawable(this,R.string.fa_camera_solid,true,false);
             break;
+          case R.id.show_3D_model:
+            icon = new FontDrawable(this,R.string.fa_cube_solid,true,false);
+            break;
 //          case R.id.power_off:
 //            icon =  new FontDrawable(this, R.string.fa_power_off_solid,true,false);
 //            break;

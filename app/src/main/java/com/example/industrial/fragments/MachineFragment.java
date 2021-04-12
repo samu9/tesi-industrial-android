@@ -20,6 +20,7 @@ import com.example.industrial.R;
 import com.example.industrial.activities.CameraActivity;
 import com.example.industrial.activities.DangerActivity;
 import com.example.industrial.activities.MachineLogActivity;
+import com.example.industrial.activities.ThreeDModelActivity;
 import com.example.industrial.menu.MenuActivity;
 import com.example.industrial.models.Machine;
 import com.example.industrial.models.MachineData;
@@ -246,6 +247,10 @@ public class MachineFragment extends BaseFragment {
                     break;
                 case R.id.take_photo:
                     takePhoto();
+                    break;
+                case R.id.show_3D_model:
+                    show3DModel();
+                    break;
 
             }
             if(message != null){
@@ -494,6 +499,12 @@ public class MachineFragment extends BaseFragment {
         intent.putExtra(CameraActivity.MACHINE_ID_EXTRA, machine.getId());
         startActivity(intent);
 
+    }
+
+    private void show3DModel(){
+        Intent intent = new Intent(getActivity(), ThreeDModelActivity.class);
+//        intent.putExtra(CameraActivity.MACHINE_ID_EXTRA, machine.getId());
+        startActivity(intent);
     }
 
     private void sendDangerMode(){
